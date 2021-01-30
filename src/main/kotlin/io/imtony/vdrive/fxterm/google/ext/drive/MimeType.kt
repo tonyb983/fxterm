@@ -1,86 +1,28 @@
-@file:Suppress("ClassName")
+@file:Suppress(
+  "ClassName",
+  "StringLiteralDuplication",
+  "MemberVisibilityCanBePrivate",
+  "unused",
+  "EndOfSentenceFormat"
+)
 
 package io.imtony.vdrive.fxterm.google.ext.drive
 
 import kotlinx.collections.immutable.ImmutableCollection
 import kotlinx.collections.immutable.toImmutableList
+import org.apache.http.Consts
+import org.apache.http.entity.ContentType
+import java.nio.charset.Charset
 import com.google.api.services.drive.model.File as DriveFile
 
-/*
-.json	  application/json
-.epub	  application/epub+zip
-.jar	  application/java-archive
-.js	    application/javascript
-.ogx	  application/ogg
-.doc	  application/msword
-.pdf	  application/pdf
-.rtf	  application/rtf
-.xml	  application/xml
-.xhtml	application/xhtml+xml
-.zip	  application/zip
-.arc	  application/octet-stream
-.bin	  application/octet-stream
-.7z	    application/x-7z-compressed
-.abw	  application/x-abiword
-.bz	    application/x-bzip
-.bz2	  application/x-bzip2
-.csh	  application/x-csh
-.rar	  application/x-rar-compressed
-.sh	    application/x-sh
-.tar	  application/x-tar
-        application/vnd.google-apps.audio
-        application/vnd.google-apps.document
-        application/vnd.google-apps.drive-sdk
-        application/vnd.google-apps.drawing
-        application/vnd.google-apps.file
-        application/vnd.google-apps.folder
-        application/vnd.google-apps.form
-        application/vnd.google-apps.fusiontable
-        application/vnd.google-apps.map
-        application/vnd.google-apps.photo
-        application/vnd.google-apps.presentation
-        application/vnd.google-apps.script
-        application/vnd.google-apps.shortcut
-        application/vnd.google-apps.site
-        application/vnd.google-apps.spreadsheet
-        application/vnd.google-apps.unknown
-        application/vnd.google-apps.video
-.xul	  application/vnd.mozilla.xul+xml
-.xls	  application/vnd.ms-excel
-.ppt	  application/vnd.ms-powerpoint
-.aac	  audio/aac
-.midi	  audio/midi
-.mid	  audio/midi
-.oga	  audio/ogg
-.wav	  audio/x-wav
-.weba	  audio/webm
-.woff	  font/woff
-.woff2	font/woff2
-.ttf	  font/ttf
-.gif	  image/gif
-.ico	  image/x-icon
-.jpeg	  image/jpeg
-.jpg	  image/jpeg
-.svg	  image/svg+xml
-.tiff	  image/tiff
-.tif	  image/tiff
-.webp	  image/webp
-.css	  text/css
-.csv	  text/csv
-.htm	  text/html
-.html	  text/html
-.ics	  text/calendar
-.webm	  video/webm
-.3gp	  video/3gpp
-.3g2	  video/3gpp2
-.avi	  video/x-msvideo
-.mpeg	  video/mpeg
-.ogv	  video/ogg
+/**
+ * Represents a mimeType [String].
+ *
+ * @property mime The actual mime [String].
  */
-
 sealed class MimeType(
   /**
-   * The actual mime string.
+   * The actual mime [String].
    */
   val mime: String
 ) {
@@ -105,7 +47,8 @@ sealed class MimeType(
   open fun hasExtension(input: String): Boolean = ext == input || exts.contains(input)
 
   /**
-   * Converts this [MimeType] to a [String] usable in a [Drive.Files.List.q][com.google.api.services.drive.Drive.Files.List.q]
+   * Converts this [MimeType] to a [String] usable in a
+   * [Drive.Files.List.q][com.google.api.services.drive.Drive.Files.List.q]
    * query string.
    */
   fun toGoogleRequestQuery(negated: Boolean = false): String = "mimeType${if (negated) "!=" else "="}'$mime'"
@@ -118,79 +61,264 @@ sealed class MimeType(
     else -> false
   }
 
-  companion object {
-    val invalid: Invalid = Invalid
-    val googleAudio: MimeCategory.Application.Google.Audio = MimeCategory.Application.Google.Audio
-    val googleDocument: MimeCategory.Application.Google.Document = MimeCategory.Application.Google.Document
-    val googleDriveSd: MimeCategory.Application.Google.DriveSdk = MimeCategory.Application.Google.DriveSdk
-    val googleDrawing: MimeCategory.Application.Google.Drawing = MimeCategory.Application.Google.Drawing
-    val googleFile: MimeCategory.Application.Google.File = MimeCategory.Application.Google.File
-    val googleFolder: MimeCategory.Application.Google.Folder = MimeCategory.Application.Google.Folder
-    val googleForm: MimeCategory.Application.Google.Form = MimeCategory.Application.Google.Form
-    val googleFusionTable: MimeCategory.Application.Google.FusionTable = MimeCategory.Application.Google.FusionTable
-    val googleMap: MimeCategory.Application.Google.Map = MimeCategory.Application.Google.Map
-    val googlePhoto: MimeCategory.Application.Google.Photo = MimeCategory.Application.Google.Photo
-    val googlePresentation: MimeCategory.Application.Google.Presentation = MimeCategory.Application.Google.Presentation
-    val googleScript: MimeCategory.Application.Google.Script = MimeCategory.Application.Google.Script
-    val googleShortcut: MimeCategory.Application.Google.Shortcut = MimeCategory.Application.Google.Shortcut
-    val googleSite: MimeCategory.Application.Google.Site = MimeCategory.Application.Google.Site
-    val googleSpreadsheet: MimeCategory.Application.Google.Spreadsheet = MimeCategory.Application.Google.Spreadsheet
-    val googleUnknown: MimeCategory.Application.Google.Unknown = MimeCategory.Application.Google.Unknown
-    val googleVideo: MimeCategory.Application.Google.Video = MimeCategory.Application.Google.Video
-    val msExcel: MimeCategory.Application.Microsoft.Excel = MimeCategory.Application.Microsoft.Excel
-    val msPowerpoint: MimeCategory.Application.Microsoft.Powerpoint = MimeCategory.Application.Microsoft.Powerpoint
-    val json: MimeCategory.Application.Json = MimeCategory.Application.Json
-    val epubZip: MimeCategory.Application.EpubZip = MimeCategory.Application.EpubZip
-    val javaArchive: MimeCategory.Application.JavaArchive = MimeCategory.Application.JavaArchive
-    val javascript: MimeCategory.Application.Javascript = MimeCategory.Application.Javascript
-    val oggExecutable: MimeCategory.Application.Ogg = MimeCategory.Application.Ogg
-    val msWord: MimeCategory.Application.MsWord = MimeCategory.Application.MsWord
-    val pdf: MimeCategory.Application.Pdf = MimeCategory.Application.Pdf
-    val rtf: MimeCategory.Application.Rtf = MimeCategory.Application.Rtf
-    val xml: MimeCategory.Application.Xml = MimeCategory.Application.Xml
-    val xhtmlXml: MimeCategory.Application.XhtmlXml = MimeCategory.Application.XhtmlXml
-    val zip: MimeCategory.Application.Zip = MimeCategory.Application.Zip
-    val octetStream: MimeCategory.Application.OctetStream = MimeCategory.Application.OctetStream
-    val abiword: MimeCategory.Application.xAbiword = MimeCategory.Application.xAbiword
-    val bzip: MimeCategory.Application.xBzip = MimeCategory.Application.xBzip
-    val bzip2: MimeCategory.Application.xBzip2 = MimeCategory.Application.xBzip2
-    val csh: MimeCategory.Application.xCsh = MimeCategory.Application.xCsh
-    val rarCompressed: MimeCategory.Application.xRarCompressed = MimeCategory.Application.xRarCompressed
-    val shell: MimeCategory.Application.xShell = MimeCategory.Application.xShell
-    val tar: MimeCategory.Application.xTar = MimeCategory.Application.xTar
-    val sevenZipCompressed: MimeCategory.Application.x7zCompressed = MimeCategory.Application.x7zCompressed
-    val aac: MimeCategory.Audio.Aac = MimeCategory.Audio.Aac
-    val midi: MimeCategory.Audio.Midi = MimeCategory.Audio.Midi
-    val oggAudio: MimeCategory.Audio.Ogg = MimeCategory.Audio.Ogg
-    val xWav: MimeCategory.Audio.XWav = MimeCategory.Audio.XWav
-    val webmAudio: MimeCategory.Audio.Webm = MimeCategory.Audio.Webm
-    val openFont: MimeCategory.Font.OpenFont = MimeCategory.Font.OpenFont
-    val woff: MimeCategory.Font.Woff = MimeCategory.Font.Woff
-    val woff2: MimeCategory.Font.Woff2 = MimeCategory.Font.Woff2
-    val trueTypeFont: MimeCategory.Font.TrueTypeFont = MimeCategory.Font.TrueTypeFont
-    val gif: MimeCategory.Image.Gif = MimeCategory.Image.Gif
-    val icon: MimeCategory.Image.Icon = MimeCategory.Image.Icon
-    val jpeg: MimeCategory.Image.Jpeg = MimeCategory.Image.Jpeg
-    val svgXml: MimeCategory.Image.SvgXml = MimeCategory.Image.SvgXml
-    val tiff: MimeCategory.Image.Tiff = MimeCategory.Image.Tiff
-    val webp: MimeCategory.Image.Webp = MimeCategory.Image.Webp
-    val css: MimeCategory.Text.Css = MimeCategory.Text.Css
-    val csv: MimeCategory.Text.Csv = MimeCategory.Text.Csv
-    val html: MimeCategory.Text.Html = MimeCategory.Text.Html
-    val calendar: MimeCategory.Text.Calendar = MimeCategory.Text.Calendar
-    val webmVideo: MimeCategory.Video.Webm = MimeCategory.Video.Webm
-    val gpp: MimeCategory.Video.Gpp = MimeCategory.Video.Gpp
-    val gpp2: MimeCategory.Video.Gpp2 = MimeCategory.Video.Gpp2
-    val msVideo: MimeCategory.Video.MsVideo = MimeCategory.Video.MsVideo
-    val mpeg: MimeCategory.Video.Mpeg = MimeCategory.Video.Mpeg
-    val oggVideo: MimeCategory.Video.Ogg = MimeCategory.Video.Ogg
+  /**
+   * Uses this [MimeType] with [ContentType.create] and the given [charset].
+   */
+  fun createContentType(charset: Charset = Consts.ISO_8859_1): ContentType = ContentType.create(this.mime, charset)
 
+  /**
+   * Uses this [MimeType] with [ContentType.getByMimeType].
+   */
+  fun getContentType(): ContentType = ContentType.getByMimeType(this.mime)
+
+  companion object {
+
+    /** */
+    val invalid: MimeType by lazy { Invalid }
+
+    /** application/vnd.google-apps.audio */
+    val googleAudio: MimeType by lazy { MimeCategory.Application.Google.Audio }
+
+    /** application/vnd.google-apps.document */
+    val googleDocument: MimeType by lazy { MimeCategory.Application.Google.Document }
+
+    /** application/vnd.google-apps.drive-sdk */
+    val googleDriveSdk: MimeType by lazy { MimeCategory.Application.Google.DriveSdk }
+
+    /** application/vnd.google-apps.drawing */
+    val googleDrawing: MimeType by lazy { MimeCategory.Application.Google.Drawing }
+
+    /** application/vnd.google-apps.file */
+    val googleFile: MimeType by lazy { MimeCategory.Application.Google.File }
+
+    /** application/vnd.google-apps.folder */
+    val googleFolder: MimeType by lazy { MimeCategory.Application.Google.Folder }
+
+    /** application/vnd.google-apps.form */
+    val googleForm: MimeType by lazy { MimeCategory.Application.Google.Form }
+
+    /** application/vnd.google-apps.fusiontable */
+    val googleFusionTable: MimeType by lazy {
+      MimeCategory.Application.Google.FusionTable
+    }
+
+    /** application/vnd.google-apps.map */
+    val googleMap: MimeType by lazy { MimeCategory.Application.Google.Map }
+
+    /** application/vnd.google-apps.photo */
+    val googlePhoto: MimeType by lazy { MimeCategory.Application.Google.Photo }
+
+    /** application/vnd.google-apps.presentation */
+    val googlePresentation: MimeType by lazy {
+      MimeCategory.Application.Google.Presentation
+    }
+
+    /** application/vnd.google-apps.script */
+    val googleScript: MimeType by lazy { MimeCategory.Application.Google.Script }
+
+    /** application/vnd.google-apps.shortcut */
+    val googleShortcut: MimeType by lazy { MimeCategory.Application.Google.Shortcut }
+
+    /** application/vnd.google-apps.site */
+    val googleSite: MimeType by lazy { MimeCategory.Application.Google.Site }
+
+    /** application/vnd.google-apps.spreadsheet */
+    val googleSpreadsheet: MimeType by lazy {
+      MimeCategory.Application.Google.Spreadsheet
+    }
+
+    /** application/vnd.google-apps.unknown */
+    val googleUnknown: MimeType by lazy { MimeCategory.Application.Google.Unknown }
+
+    /** application/vnd.google-apps.video */
+    val googleVideo: MimeType by lazy { MimeCategory.Application.Google.Video }
+
+    /** application/vnd.ms-excel */
+    val msExcel: MimeType by lazy { MimeCategory.Application.Microsoft.Excel }
+
+    /** application/vnd.ms-powerpoint */
+    val msPowerpoint: MimeType by lazy {
+      MimeCategory.Application.Microsoft.Powerpoint
+    }
+
+    /** application/vnd.openxmlformats-officedocument.wordprocessingml.document */
+    val openWordDocument: MimeType by lazy {
+      MimeCategory.Application.OpenWordDocument
+    }
+
+    /** application/vnd.openxmlformats-officedocument.spreadsheetml.sheet */
+    val openExcelDocument: MimeType by lazy {
+      MimeCategory.Application.OpenExcelDocument
+    }
+
+    /** application/vnd.openxmlformats-officedocument.presentationml.presentation */
+    val openPowerpointDocument: MimeType by lazy {
+      MimeCategory.Application.OpenPowerpointDocument
+    }
+
+    /** application/vnd.oasis.opendocument.document */
+    val openOfficeDoc: MimeType by lazy {
+      MimeCategory.Application.OpenOfficeDocument
+    }
+
+    /** application/x-vnd.oasis.opendocument.spreadsheet */
+    val openOfficeSheet: MimeType by lazy {
+      MimeCategory.Application.OpenOfficeSpreadsheet
+    }
+
+    /** application/vnd.oasis.opendocument.presentation */
+    val openOfficePresentation: MimeType by lazy {
+      MimeCategory.Application.OpenOfficePresentation
+    }
+
+    /** application/json */
+    val json: MimeType by lazy { MimeCategory.Application.Json }
+
+    /** application/epub+zip */
+    val epubZip: MimeType by lazy { MimeCategory.Application.EpubZip }
+
+    /** application/java-archive */
+    val javaArchive: MimeType by lazy { MimeCategory.Application.JavaArchive }
+
+    /** application/javascript */
+    val javascript: MimeType by lazy { MimeCategory.Application.Javascript }
+
+    /** application/ogg */
+    val oggExecutable: MimeType by lazy { MimeCategory.Application.Ogg }
+
+    /** application/msword */
+    val msWord: MimeType by lazy { MimeCategory.Application.MsWord }
+
+    /** application/pdf */
+    val pdf: MimeType by lazy { MimeCategory.Application.Pdf }
+
+    /** application/rtf */
+    val rtf: MimeType by lazy { MimeCategory.Application.Rtf }
+
+    /** application/xml */
+    val xml: MimeType by lazy { MimeCategory.Application.Xml }
+
+    /** application/xhtml+xml */
+    val xhtmlXml: MimeType by lazy { MimeCategory.Application.XhtmlXml }
+
+    /** application/zip */
+    val zip: MimeType by lazy { MimeCategory.Application.Zip }
+
+    /** application/octet-stream */
+    val octetStream: MimeType by lazy { MimeCategory.Application.OctetStream }
+
+    /** application/x-abiword */
+    val abiword: MimeType by lazy { MimeCategory.Application.xAbiword }
+
+    /** application/x-bzip */
+    val bzip: MimeType by lazy { MimeCategory.Application.xBzip }
+
+    /** application/x-bzip2 */
+    val bzip2: MimeType by lazy { MimeCategory.Application.xBzip2 }
+
+    /** application/x-csh */
+    val csh: MimeType by lazy { MimeCategory.Application.xCsh }
+
+    /** application/x-rar-compressed */
+    val rarCompressed: MimeType by lazy { MimeCategory.Application.xRarCompressed }
+
+    /** application/x-sh */
+    val shell: MimeType by lazy { MimeCategory.Application.xShell }
+
+    /** application/x-tar */
+    val tar: MimeType by lazy { MimeCategory.Application.xTar }
+
+    /** application/x-7z-compressed */
+    val sevenZipCompressed: MimeType by lazy { MimeCategory.Application.x7zCompressed }
+
+    /** audio/aac */
+    val aac: MimeType by lazy { MimeCategory.Audio.Aac }
+
+    /** audio/midi */
+    val midi: MimeType by lazy { MimeCategory.Audio.Midi }
+
+    /** audio/ogg */
+    val oggAudio: MimeType by lazy { MimeCategory.Audio.Ogg }
+
+    /** audio/x-wav */
+    val xWav: MimeType by lazy { MimeCategory.Audio.XWav }
+
+    /** audio/webm */
+    val webmAudio: MimeType by lazy { MimeCategory.Audio.Webm }
+
+    /** font/otf */
+    val openFont: MimeType by lazy { MimeCategory.Font.OpenFont }
+
+    /** font/woff */
+    val woff: MimeType by lazy { MimeCategory.Font.Woff }
+
+    /** font/woff2 */
+    val woff2: MimeType by lazy { MimeCategory.Font.Woff2 }
+
+    /** font/ttf */
+    val trueTypeFont: MimeType by lazy { MimeCategory.Font.TrueTypeFont }
+
+    /** image/gif */
+    val gif: MimeType by lazy { MimeCategory.Image.Gif }
+
+    /** image/x-icon */
+    val icon: MimeType by lazy { MimeCategory.Image.Icon }
+
+    /** image/jpeg */
+    val jpeg: MimeType by lazy { MimeCategory.Image.Jpeg }
+
+    /** image/svg+xml */
+    val svgXml: MimeType by lazy { MimeCategory.Image.SvgXml }
+
+    /** image/tiff */
+    val tiff: MimeType by lazy { MimeCategory.Image.Tiff }
+
+    /** image/webp */
+    val webp: MimeType by lazy { MimeCategory.Image.Webp }
+
+    /** text/plain */
+    val plain: MimeType by lazy { MimeCategory.Text.Plain }
+
+    /** text/css */
+    val css: MimeType by lazy { MimeCategory.Text.Css }
+
+    /** text/csv */
+    val csv: MimeType by lazy { MimeCategory.Text.Csv }
+
+    /** text/tab-separated-values */
+    val tsv: MimeType by lazy { MimeCategory.Text.Tsv }
+
+    /** text/html */
+    val html: MimeType by lazy { MimeCategory.Text.Html }
+
+    /** text/calendar */
+    val calendar: MimeType by lazy { MimeCategory.Text.Calendar }
+
+    /** video/webm */
+    val webmVideo: MimeType by lazy { MimeCategory.Video.Webm }
+
+    /** video/3gpp */
+    val gpp: MimeType by lazy { MimeCategory.Video.Gpp }
+
+    /** video/3gpp2 */
+    val gpp2: MimeType by lazy { MimeCategory.Video.Gpp2 }
+
+    /** video/x-msvideo */
+    val msVideo: MimeType by lazy { MimeCategory.Video.MsVideo }
+
+    /** video/mpeg */
+    val mpeg: MimeType by lazy { MimeCategory.Video.Mpeg }
+
+    /** video/ogg */
+    val oggVideo: MimeType by lazy { MimeCategory.Video.Ogg }
+
+    /** All of the existing mime types. */
     val allMimes: ImmutableCollection<MimeType> by lazy {
       listOf(
         invalid,
         googleAudio,
         googleDocument,
-        googleDriveSd,
+        googleDriveSdk,
         googleDrawing,
         googleFile,
         googleFolder,
@@ -207,6 +335,12 @@ sealed class MimeType(
         googleVideo,
         msExcel,
         msPowerpoint,
+        openWordDocument,
+        openExcelDocument,
+        openPowerpointDocument,
+        openOfficePresentation,
+        openOfficeDoc,
+        openOfficeSheet,
         json,
         epubZip,
         javaArchive,
@@ -242,8 +376,10 @@ sealed class MimeType(
         svgXml,
         tiff,
         webp,
+        plain,
         css,
         csv,
+        tsv,
         html,
         calendar,
         webmVideo,
@@ -255,32 +391,22 @@ sealed class MimeType(
       ).toImmutableList()
     }
 
+    /**
+     * Gets the [DriveFile.mimeType] from this [file] and converts it to a [MimeType].
+     */
     fun from(file: DriveFile?): MimeType =
       if (file == null || file.mimeType == null) Invalid else fromString(file.mimeType)
 
+    /**
+     * Converts this [input] [String] to a [MimeType]. Null or empty or unknown strings will become [Invalid].
+     */
     fun from(input: String?): MimeType = fromString(input)
 
+    /**
+     * Converts this [input] [String] to a [MimeType]. Null or empty or unknown strings will become [Invalid].
+     */
+    @Suppress("LongMethod")
     fun fromString(input: String?): MimeType = when (input) {
-      "application/json" -> MimeCategory.Application.Json
-      "application/epub+zip" -> MimeCategory.Application.EpubZip
-      "application/java-archive" -> MimeCategory.Application.JavaArchive
-      "application/javascript" -> MimeCategory.Application.Javascript
-      "application/ogg" -> MimeCategory.Application.Ogg
-      "application/msword" -> MimeCategory.Application.MsWord
-      "application/pdf" -> MimeCategory.Application.Pdf
-      "application/rtf" -> MimeCategory.Application.Rtf
-      "application/xml" -> MimeCategory.Application.Xml
-      "application/xhtml+xml" -> MimeCategory.Application.XhtmlXml
-      "application/zip" -> MimeCategory.Application.Zip
-      "application/octet-stream" -> MimeCategory.Application.OctetStream
-      "application/x-7z-compressed" -> MimeCategory.Application.x7zCompressed
-      "application/x-abiword" -> MimeCategory.Application.xAbiword
-      "application/x-bzip" -> MimeCategory.Application.xBzip
-      "application/x-bzip2" -> MimeCategory.Application.xShell
-      "application/x-csh" -> MimeCategory.Application.xCsh
-      "application/x-rar-compressed" -> MimeCategory.Application.xRarCompressed
-      "application/x-sh" -> MimeCategory.Application.xShell
-      "application/x-tar" -> MimeCategory.Application.xTar
       "application/vnd.google-apps.audio" -> MimeCategory.Application.Google.Audio
       "application/vnd.google-apps.document" -> MimeCategory.Application.Google.Document
       "application/vnd.google-apps.drive-sdk" -> MimeCategory.Application.Google.DriveSdk
@@ -300,6 +426,32 @@ sealed class MimeType(
       "application/vnd.google-apps.video" -> MimeCategory.Application.Google.Video
       "application/vnd.ms-excel" -> MimeCategory.Application.Microsoft.Excel
       "application/vnd.ms-powerpoint" -> MimeCategory.Application.Microsoft.Powerpoint
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> openWordDocument
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" -> openExcelDocument
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation" -> openPowerpointDocument
+      "application/vnd.oasis.opendocument.document" -> openOfficeDoc
+      "application/x-vnd.oasis.opendocument.spreadsheet" -> openOfficeSheet
+      "application/vnd.oasis.opendocument.presentation" -> openOfficePresentation
+      "application/json" -> MimeCategory.Application.Json
+      "application/epub+zip" -> MimeCategory.Application.EpubZip
+      "application/java-archive" -> MimeCategory.Application.JavaArchive
+      "application/javascript" -> MimeCategory.Application.Javascript
+      "application/ogg" -> MimeCategory.Application.Ogg
+      "application/msword" -> MimeCategory.Application.MsWord
+      "application/pdf" -> MimeCategory.Application.Pdf
+      "application/rtf" -> MimeCategory.Application.Rtf
+      "application/xml" -> MimeCategory.Application.Xml
+      "application/xhtml+xml" -> MimeCategory.Application.XhtmlXml
+      "application/zip" -> MimeCategory.Application.Zip
+      "application/octet-stream" -> MimeCategory.Application.OctetStream
+      "application/x-abiword" -> MimeCategory.Application.xAbiword
+      "application/x-bzip" -> MimeCategory.Application.xBzip
+      "application/x-bzip2" -> MimeCategory.Application.xShell
+      "application/x-csh" -> MimeCategory.Application.xCsh
+      "application/x-rar-compressed" -> MimeCategory.Application.xRarCompressed
+      "application/x-sh" -> MimeCategory.Application.xShell
+      "application/x-tar" -> MimeCategory.Application.xTar
+      "application/x-7z-compressed" -> MimeCategory.Application.x7zCompressed
       "audio/aac" -> MimeCategory.Audio.Aac
       "audio/midi" -> MimeCategory.Audio.Midi
       "audio/ogg" -> MimeCategory.Audio.Ogg
@@ -315,10 +467,12 @@ sealed class MimeType(
       "image/svg+xml" -> MimeCategory.Image.SvgXml
       "image/tiff" -> MimeCategory.Image.Tiff
       "image/webp" -> MimeCategory.Image.Webp
+      "text/plain" -> MimeCategory.Text.Plain
       "text/css" -> MimeCategory.Text.Css
       "text/csv" -> MimeCategory.Text.Csv
       "text/html" -> MimeCategory.Text.Html
       "text/calendar" -> MimeCategory.Text.Calendar
+      "text/tab-separated-values" -> MimeCategory.Text.Tsv
       "video/webm" -> MimeCategory.Video.Webm
       "video/3gpp" -> MimeCategory.Video.Gpp
       "video/3gpp2" -> MimeCategory.Video.Gpp2
@@ -344,91 +498,159 @@ object Invalid : MimeType("INVALID") {
 
 /**
  * Base class for all [MimeType] categories.
+ *
+ * @property categoryName The formal name of this category.
  */
 sealed class MimeCategory(
-  val mainType: String,
-  val subType: String,
+  /**
+   * The main type for this mimeType.
+   */
+  mainType: String,
+  /**
+   * The sub type for this mimeType.
+   */
+  subType: String,
+  /**
+   * The *formal* name for this category, i.e. Application, Audio, Font, etc.
+   */
   val categoryName: String
 ) : MimeType("$mainType/$subType") {
+  /**
+   *  Application MimeTypes.
+   */
   sealed class Application(subType: String) : MimeCategory("application", subType, "Application") {
+    /**
+     *  Google MimeTypes.
+     */
     sealed class Google(googleType: String) : Application("vnd.google-apps.$googleType") {
       override fun hasExtension(input: String): Boolean = false
 
+      /**
+       *  GoogleAudio MimeType.
+       */
       object Audio : Google("audio") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google Document MimeType.
+       */
       object Document : Google("document") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google DriveSdk MimeType.
+       */
       object DriveSdk : Google("drive-sdk") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google Drawing MimeType.
+       */
       object Drawing : Google("drawing") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google File MimeType.
+       */
       object File : Google("file") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google Folder MimeType.
+       */
       object Folder : Google("folder") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google Form MimeType.
+       */
       object Form : Google("form") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google FusionTable MimeType.
+       */
       object FusionTable : Google("fusiontable") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google Map MimeType.
+       */
       object Map : Google("map") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google Photo MimeType.
+       */
       object Photo : Google("photo") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google Presentation MimeType.
+       */
       object Presentation : Google("presentation") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google Script MimeType.
+       */
       object Script : Google("script") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google Shortcut MimeType.
+       */
       object Shortcut : Google("shortcut") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google Site MimeType.
+       */
       object Site : Google("site") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google Sheets MimeType.
+       */
       object Spreadsheet : Google("spreadsheet") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Unknown Google MimeType.
+       */
       object Unknown : Google("unknown") {
         override val isFinalType: Boolean = true
       }
 
+      /**
+       *  Google Video MimeType.
+       */
       object Video : Google("video") {
         override val isFinalType: Boolean = true
       }
     }
 
     /**
-     * Microsoft Application Mime Types
+     * Microsoft Application Mime Types.
      */
     sealed class Microsoft(ms: String) : Application("vnd.ms-$ms") {
       /**
-       * Excel MimeType
+       * Excel MimeType.
        */
       object Excel : Microsoft("excel") {
         override val exts: List<String> = listOf("xls", "xlsm", "xlsx", "xlsb", "xlt", "xltm")
@@ -436,7 +658,7 @@ sealed class MimeCategory(
       }
 
       /**
-       * Powerpoint MimeType
+       * Powerpoint MimeType.
        */
       object Powerpoint : Microsoft("powerpoint") {
         override val ext: String = "ppt"
@@ -445,7 +667,53 @@ sealed class MimeCategory(
     }
 
     /**
-     * Json MimeType
+     * The OpenOffice Document format.
+     */
+    object OpenOfficeDocument : Application("vnd.oasis.opendocument.text") {
+      override val isFinalType: Boolean = true
+    }
+
+    /**
+     * The OpenOffice Spreadsheet format.
+     */
+    object OpenOfficeSpreadsheet : Application("x-vnd.oasis.opendocument.spreadsheet") {
+      override val isFinalType: Boolean = true
+    }
+
+    /**
+     * The OpenOffice Presentation format.
+     */
+    object OpenOfficePresentation : Application(
+      "vnd.oasis.opendocument.presentation"
+    ) {
+      override val isFinalType: Boolean = true
+    }
+
+    /**
+     * The OpenDocument version of a Microsoft Word document.
+     */
+    object OpenWordDocument : Application("vnd.openxmlformats-officedocument.wordprocessingml.document") {
+      override val isFinalType: Boolean = true
+    }
+
+    /**
+     * The OpenDocument version of a Microsoft Excel document.
+     */
+    object OpenExcelDocument : Application("vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+      override val isFinalType: Boolean = true
+    }
+
+    /**
+     * The OpenDocument version of a Microsoft Powerpoint document.
+     */
+    object OpenPowerpointDocument : Application(
+      "vnd.openxmlformats-officedocument.presentationml.presentation"
+    ) {
+      override val isFinalType: Boolean = true
+    }
+
+    /**
+     * Json MimeType.
      */
     object Json : Application("json") {
       override val ext: String = "json"
@@ -453,7 +721,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  EpubZip MimeType
+     *  EpubZip MimeType.
      */
     object EpubZip : Application("epub+zip") {
       override val ext: String = "epub"
@@ -461,7 +729,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  JavaArchive MimeType
+     *  JavaArchive MimeType.
      */
     object JavaArchive : Application("java-archive") {
       override val ext: String = "jar"
@@ -469,7 +737,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  Javascript MimeType
+     *  Javascript MimeType.
      */
     object Javascript : Application("javascript") {
       override val ext: String = "js"
@@ -477,7 +745,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  Ogg MimeType
+     *  Ogg MimeType.
      */
     object Ogg : Application("ogg") {
       override val ext: String = "ogx"
@@ -485,7 +753,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  MsWord MimeType
+     *  MsWord MimeType.
      */
     object MsWord : Application("msword") {
       override val ext: String = "doc"
@@ -493,7 +761,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  Pdf MimeType
+     *  Pdf MimeType.
      */
     object Pdf : Application("pdf") {
       override val ext: String = "pdf"
@@ -501,7 +769,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  Rtf MimeType
+     *  Rtf MimeType.
      */
     object Rtf : Application("rtf") {
       override val ext: String = "rtf"
@@ -509,7 +777,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  Xml MimeType
+     *  Xml MimeType.
      */
     object Xml : Application("xml") {
       override val ext: String = "xml"
@@ -517,7 +785,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  XhtmlXml MimeType
+     *  XhtmlXml MimeType.
      */
     object XhtmlXml : Application("xhtml+xml") {
       override val ext: String = "xhtml"
@@ -525,7 +793,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  Zip MimeType
+     *  Zip MimeType.
      */
     object Zip : Application("zip") {
       override val ext: String = "zip"
@@ -533,7 +801,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  OctetStream MimeType
+     *  OctetStream MimeType.
      */
     object OctetStream : Application("octet-stream") {
       override val exts: List<String> = listOf("arc", "bin")
@@ -541,7 +809,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  x7zCompressed MimeType
+     *  x7zCompressed MimeType.
      */
     object x7zCompressed : Application("x-7z-compressed") {
       override val ext: String = "7z"
@@ -549,7 +817,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  xAbiword MimeType
+     *  xAbiword MimeType.
      */
     object xAbiword : Application("x-abiword") {
       override val ext: String = "abw"
@@ -557,7 +825,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  xBzip MimeType
+     *  xBzip MimeType.
      */
     object xBzip : Application("x-bzip") {
       override val ext: String = "bz"
@@ -565,7 +833,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  xBzip2 MimeType
+     *  xBzip2 MimeType.
      */
     object xBzip2 : Application("x-bzip2") {
       override val ext: String = "bz2"
@@ -573,7 +841,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  xCsh MimeType
+     *  xCsh MimeType.
      */
     object xCsh : Application("x-csh") {
       override val ext: String = "csh"
@@ -581,7 +849,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  xRarCompressed MimeType
+     *  xRarCompressed MimeType.
      */
     object xRarCompressed : Application("x-rar-compressed") {
       override val ext: String = "rar"
@@ -589,7 +857,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  xShell MimeType
+     *  xShell MimeType.
      */
     object xShell : Application("x-sh") {
       override val ext: String = "sh"
@@ -597,7 +865,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *  xTar MimeType
+     *  xTar MimeType.
      */
     object xTar : Application("x-tar") {
       override val ext: String = "tar"
@@ -606,11 +874,11 @@ sealed class MimeCategory(
   }
 
   /**
-   *  Audio MimeTypes
+   *  Audio MimeTypes.
    */
   sealed class Audio(subType: String) : MimeCategory("audio", subType, "Audio") {
     /**
-     *   Aac MimeType
+     *   Aac MimeType.
      */
     object Aac : Audio("aac") {
       override val ext: String = "aac"
@@ -618,7 +886,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *   Midi MimeType
+     *   Midi MimeType.
      */
     object Midi : Audio("midi") {
       override val exts: List<String> = listOf("mid", "midi")
@@ -626,7 +894,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *   Ogg MimeType
+     *   Ogg MimeType.
      */
     object Ogg : Audio("ogg") {
       override val ext: String = "oga"
@@ -634,7 +902,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *   XWav MimeType
+     *   XWav MimeType.
      */
     object XWav : Audio("x-wav") {
       override val ext: String = "wav"
@@ -642,7 +910,7 @@ sealed class MimeCategory(
     }
 
     /**
-     *   Webm MimeType
+     *   Webm MimeType.
      */
     object Webm : Audio("webm") {
       override val ext: String = "weba"
@@ -651,11 +919,11 @@ sealed class MimeCategory(
   }
 
   /**
-   * Font MimeTypes
+   * Font MimeTypes.
    */
   sealed class Font(subType: String) : MimeCategory("font", subType, "Font") {
     /**
-     * OpenFont MimeTypes
+     * OpenFont MimeTypes.
      */
     object OpenFont : Font("oft") {
       override val ext: String = "oft"
@@ -663,7 +931,7 @@ sealed class MimeCategory(
     }
 
     /**
-     * Woff MimeTypes
+     * Woff MimeTypes.
      */
     object Woff : Font("woff") {
       override val ext: String = "woff"
@@ -671,7 +939,7 @@ sealed class MimeCategory(
     }
 
     /**
-     * Woff2 MimeTypes
+     * Woff2 MimeTypes.
      */
     object Woff2 : Font("woff2") {
       override val ext: String = "woff2"
@@ -679,7 +947,7 @@ sealed class MimeCategory(
     }
 
     /**
-     * TrueTypeFont MimeTypes
+     * TrueTypeFont MimeTypes.
      */
     object TrueTypeFont : Font("ttf") {
       override val ext: String = "ttf"
@@ -688,34 +956,52 @@ sealed class MimeCategory(
   }
 
   /**
-   * Image MimeTypes
+   * Image MimeTypes.
    */
   sealed class Image(subType: String) : MimeCategory("image", subType, "Image") {
+    /**
+     *  Gif MimeType.
+     */
     object Gif : Image("gif") {
       override val ext: String = "gif"
       override val isFinalType: Boolean = true
     }
 
+    /**
+     *  Icon MimeType.
+     */
     object Icon : Image("x-icon") {
       override val ext: String = "icon"
       override val isFinalType: Boolean = true
     }
 
+    /**
+     *  Jpeg MimeType.
+     */
     object Jpeg : Image("jpeg") {
       override val exts: List<String> = listOf("jpg", "jpeg")
       override val isFinalType: Boolean = true
     }
 
+    /**
+     *  SvgXml MimeType.
+     */
     object SvgXml : Image("svg+xml") {
       override val ext: String = "svg"
       override val isFinalType: Boolean = true
     }
 
+    /**
+     *  Tiff MimeType.
+     */
     object Tiff : Image("tiff") {
       override val exts: List<String> = listOf("tif", "tiff")
       override val isFinalType: Boolean = true
     }
 
+    /**
+     *  Webp MimeType.
+     */
     object Webp : Image("webp") {
       override val ext: String = "webp"
       override val isFinalType: Boolean = true
@@ -723,66 +1009,111 @@ sealed class MimeCategory(
   }
 
   /**
-   * Text MimeTypes
+   * Text MimeTypes.
    */
   sealed class Text(subType: String) : MimeCategory("text", subType, "Text") {
+    /**
+     *  Css MimeType.
+     */
     object Css : Text("css") {
       override val ext: String = "css"
       override val isFinalType: Boolean = true
     }
 
+    /**
+     *  Csv MimeType.
+     */
     object Csv : Text("csv") {
       override val ext: String = "csv"
       override val isFinalType: Boolean = true
     }
 
+    /**
+     * Tab Separated Value MimeType.
+     */
+    object Tsv : Text("tab-separated-values") {
+      override val ext: String = "tsv"
+      override val isFinalType: Boolean = true
+    }
+
+    /**
+     *  Html MimeType.
+     */
     object Html : Text("html") {
       override val exts: List<String> = listOf("htm", "html")
       override val isFinalType: Boolean = true
     }
 
+    /**
+     *  Calendar MimeType.
+     */
     object Calendar : Text("calendar") {
       override val ext: String = "ics"
+      override val isFinalType: Boolean = true
+    }
+
+    /**
+     *  Plain Text MimeType.
+     */
+    object Plain : Text("plain") {
+      override val ext: String = "txt"
       override val isFinalType: Boolean = true
     }
   }
 
   /**
-   * Video MimeTypes
+   * Video MimeTypes.
    */
   sealed class Video(subType: String) : MimeCategory("video", subType, "Video") {
+    /**
+     *  Webm MimeType.
+     */
     object Webm : Video("webm") {
       override val ext: String = "webm"
       override val isFinalType: Boolean = true
     }
 
+    /**
+     *  Gpp MimeType.
+     */
     object Gpp : Video("3gpp") {
       override val ext: String = "3gp"
       override val isFinalType: Boolean = true
     }
 
+    /**
+     *  Gpp2 MimeType.
+     */
     object Gpp2 : Video("3gpp2") {
       override val ext: String = "3g2"
       override val isFinalType: Boolean = true
     }
 
+    /**
+     *  MsVideo MimeType.
+     */
     object MsVideo : Video("x-msvideo") {
       override val ext: String = "avi"
       override val isFinalType: Boolean = true
     }
 
+    /**
+     *  Mpeg MimeType.
+     */
     object Mpeg : Video("mpeg") {
       override val exts: List<String> = listOf("mpg", "mpeg")
       override val isFinalType: Boolean = true
     }
 
+    /**
+     *  Ogg MimeType.
+     */
     object Ogg : Video("ogg") {
       override val ext: String = "ogg"
       override val isFinalType: Boolean = true
     }
   }
 }
-
 
 /**
  * Converts this value [String] value to a [MimeType] object. Will return [MimeType.invalid]
@@ -799,7 +1130,8 @@ fun String.asMimeType(): MimeType = MimeType.from(this)
 fun DriveFile.isDriveFolder(): Boolean = this.mimeType != null && this.mimeType == MimeType.googleFolder.mime
 
 /**
- * Whether this [DriveFile][com.google.api.services.drive.model.File] is a Google Drive [Shortcut][MimeType.googleShortcut].
+ * Whether this [DriveFile][com.google.api.services.drive.model.File] is a Google
+ * Drive [Shortcut][MimeType.googleShortcut].
  * This will return false if the [com.google.api.services.drive.model.File.mimeType] was not fetched from
  * the Drive Service.
  * #### I.e. this.mimeType == "application/vnd.google-apps.shortcut"
@@ -813,4 +1145,3 @@ fun DriveFile.isDriveShortcut(): Boolean = this.mimeType != null && this.mimeTyp
 fun DriveFile.isDriveFile(): Boolean = this.mimeType != null && this.mimeType.let {
   it != MimeType.googleDocument.mime && it != MimeType.googleShortcut.mime && it != MimeType.invalid.mime
 }
-

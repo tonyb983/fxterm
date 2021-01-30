@@ -32,10 +32,10 @@ javafx {
 }
 
 detekt {
-  config = files("./config/detekt/detekt.yml")
+  config = files(projectDir.resolve("./config/detekt/detekt.yml"))
   ignoreFailures = true
   basePath = projectDir.toString()
-
+  baseline = projectDir.resolve("config/detekt/baseline.xml")
 }
 
 dependencies {
@@ -46,11 +46,18 @@ dependencies {
   implementation(kotlin("reflect", "1.4.21"))
   implementation(kotlin("stdlib-jdk8", "1.4.21"))
 
+  implementation("io.github.microutils:kotlin-logging-jvm:2.0.2")
+
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:1.4.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.4.2")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
   implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.3")
+
+  implementation("org.apache.httpcomponents:httpclient:4.5.13")
+  implementation("org.apache.httpcomponents:httpcore-nio:4.4.14")
+  implementation("org.apache.httpcomponents:httpasyncclient:4.1.4")
+  implementation("org.apache.httpcomponents:fluent-hc:4.5.13")
 
   implementation("com.rickbusarow.dispatch:dispatch-core:1.0.0-beta08")
 
@@ -107,7 +114,9 @@ tasks.withType<KotlinCompile> {
     freeCompilerArgs = listOf(
       "-Xjsr305=strict",
       "-Xinline-classes",
-      "-Xopt-in=kotlin.io.path.ExperimentalPathApi"
+      "-Xopt-in=kotlin.io.path.ExperimentalPathApi",
+      "-Xopt-in=kotlin.contracts.ExperimentalContracts",
+      "-Xopt-in=kotlin.ExperimentalStdlibApi"
     )
     jvmTarget = "15"
     apiVersion = "1.4"

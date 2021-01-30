@@ -20,6 +20,9 @@ import kotlin.coroutines.CoroutineContext
 
 private val EOL by lazy { String.getLineEnding() }
 
+/**
+ * The main / starting view for the application.
+ */
 class MainView : View("Main View"), CoroutineScope {
 
   private val outputHistory = mutableListOf<String>()
@@ -29,7 +32,7 @@ class MainView : View("Main View"), CoroutineScope {
   private val currentInput = stringProperty("")
   private val inputLock = lockProperty
 
-  private val consoleFont = Font.loadFont(resources.url("/fonts/consola.ttf").toExternalForm(), 12.0)
+  private val consoleFont by lazy { FontLocker.getFont(AppFonts.Consola, 12) }
 
   private var google: GoogleServiceCollection by singleAssign()
   private var DFS: DriveFileSystem by singleAssign()
@@ -48,7 +51,7 @@ class MainView : View("Main View"), CoroutineScope {
 
   private fun addOutput(text: String) {
     outputHistory.add(text)
-    outputDisplay.plusAssign("${text}${EOL}")
+    outputDisplay.plusAssign("$text$EOL")
   }
 
   private fun onPressedEnter(tf: TextField) {
@@ -60,6 +63,9 @@ class MainView : View("Main View"), CoroutineScope {
     }
   }
 
+  /**
+   * The root node for this [UIComponent].
+   */
   override val root: Parent = borderpane {
     setPrefSize(800.0, 600.0)
     center {

@@ -2,58 +2,136 @@ package io.imtony.vdrive.fxterm.google.services
 
 import com.google.api.services.drive.Drive
 import io.imtony.vdrive.fxterm.google.ext.drive.*
+import io.imtony.vdrive.fxterm.utils.ifNotNull
 import java.io.ByteArrayOutputStream
 import com.google.api.services.drive.model.File as DriveFile
 import com.google.api.services.drive.model.FileList as DriveFileList
 
+/**
+ * Wraps the query modifiers that can be applied to [Drive.Files.List].
+ *
+ * @property q The Query parameter.
+ * @property corpora The corpora parameter.
+ * @property space The spaces parameter.
+ * @property fields The fields parameter.
+ * @property maxResults The max results returned.
+ */
 data class FileSearchParameters(
-  val query: String? = null,
-  val spaces: String? = null,
-  val spacesType: DriveSpaces? = null,
+  /**
+   * The Query parameter.
+   */
+  val q: String? = null,
+  /**
+   * The corpora parameter.
+   */
   val corpora: String? = null,
-  val corporaType: DriveCorporas? = null,
+  /**
+   * The spaces parameter.
+   */
+  val space: String? = null,
+  /**
+   * The fields parameter.
+   */
+  val fields: String? = null,
+  /**
+   * The max results returned. Note, setting this will automatically also set
+   * **nextPageToken** and **files(id,name,mimeType)** on the fields parameter
+   * if no field parameter is supplied.
+   */
+  val maxResults: Int? = null,
 )
 
-private fun Drive.Files.List.applyParams(fsp: FileSearchParameters) = this.apply {
-  if (fsp.corpora != null) {
-    corpora = fsp.corpora
-  } else if (fsp.corporaType != null) {
-    setCorpora(fsp.corporaType)
+/**
+ * Applies the given [any non-null members of fsp][FileSearchParameters] to this [Drive.Files.List] request.
+ */
+fun Drive.Files.List.applyParams(fsp: FileSearchParameters): Drive.Files.List = this.apply {
+  fsp.corpora.ifNotNull {
+    corpora = it
   }
 
-  if (fsp.spaces != null) {
-    spaces = fsp.spaces
-  } else if (fsp.spacesType != null) {
-    setSpaces(fsp.spacesType)
+  fsp.space.ifNotNull {
+    spaces = it
   }
 
-  if (fsp.query != null) {
-    q = fsp.query
+  fsp.q.ifNotNull {
+    q = it
+  }
+
+  if (fsp.fields != null && fsp.maxResults != null) {
+    fields = "maxResults=${fsp.maxResults},nextPageToken,${fsp.fields}"
+  } else {
+    fsp.fields.ifNotNull {
+      fields = it
+    }
+
+    fsp.maxResults.ifNotNull {
+      fields = "maxResults=${fsp.maxResults},nextPageToken,files(id,name,mimeType)"
+    }
   }
 }
 
-val Drive.Files.List.defaultSpace get() = DriveSpaces.Drive
-val Drive.Files.List.defaultCorpora get() = DriveCorporas.User
-fun Drive.Files.List.onlyNameAndId(): Drive.Files.List = this.setFields("files(id, name)")
-fun Drive.Files.List.nameIdAndMax(max: Int): Drive.Files.List =
-  this.setFields("maxResults=$max,nextPageToken,files(id, name)")
+/**
+ * Creates and executes an [Drive.Files.Export] request and returns the [ByteArrayOutputStream] it
+ * has been piped into.
+ */
+fun Drive.downloadFile(id: String, type: MimeType = MimeType.pdf): ByteArrayOutputStream = ByteArrayOutputStream()
+  .apply {
+    files()
+      .export(id, type.mime)
+      .executeMediaAndDownloadTo(this)
+  }
 
+/**
+ * Sets the fields to be returned from this request as id and name only.
+ */
+fun Drive.Files.List.onlyNameAndId(): Drive.Files.List = this.setFields("files(id,name)")
+
+/**
+ * Sets the fields to be returned from this request as id, name, and mimeType only.
+ */
+fun Drive.Files.List.onlyNameMimeAndId(): Drive.Files.List = this.setFields("files(id,name,mimeType)")
+
+/**
+ * Sets the fields to be returned from this request as id, name, and the nextPageToken only, and sets
+ * max results at a time as [max].
+ */
+fun Drive.Files.List.nameIdAndMax(max: Int): Drive.Files.List =
+  this.setFields("maxResults=$max,nextPageToken,files(id,name)")
+
+/**
+ * Sets the fields to be returned from this request as id, name, mimeType, and the nextPageToken only, and sets
+ * max results at a time as [max].
+ */
+fun Drive.Files.List.nameMimeIdAndMax(max: Int): Drive.Files.List =
+  this.setFields("maxResults=$max,nextPageToken,files(id,name,mimeType)")
+
+/**
+ * Sets the space to [defaultSpace], sets the corpora to [defaultCorpora], and sets Q to be "trashed = false".
+ */
 fun Drive.Files.List.setDefaults(): Drive.Files.List = this
   .setSpaces(defaultSpace)
   .setCorpora(defaultCorpora)
   .setQ("trashed = false")
 
+/**
+ * The main interface used to interact with the Google [Drive] service.
+ */
 interface GoogleDriveService : GoogleService<Drive> {
+  /**
+   * The actual service.
+   */
   override val service: Drive
 
   companion object {
+    /**
+     * Constructor function for a [GoogleDriveService].
+     */
     fun create(serviceInitializer: ServiceInitializer): GoogleDriveService = GoogleDriveServiceImpl(serviceInitializer)
   }
 }
 
-
 private class GoogleDriveServiceImpl(serviceCreator: ServiceInitializer) : GoogleDriveService,
-  GenericInjectedService<Drive>(lazy { serviceCreator.createDrive() }) {
+  GenericService<Drive>(lazy { serviceCreator.createDrive() }) {
   var defaultCorporas: DriveCorporas = DriveCorporas.User
   var defaultSpaces: DriveSpaces = DriveSpaces.Drive
 
@@ -85,8 +163,11 @@ private class GoogleDriveServiceImpl(serviceCreator: ServiceInitializer) : Googl
   fun fetchFolders(name: String, exact: Boolean): DriveFileList? = fetchFiles {
     this.setDefaults()
     fields = "files(id, name, mimeType)"
-    q =
-      "trashed = false and ${MimeType.googleFolder.toGoogleRequestQuery()} and name ${if (exact) "=" else "contains"} '${name}'"
+    q = "trashed = false" +
+      " and " +
+      MimeType.googleFolder.toGoogleRequestQuery() +
+      " and " +
+      "name ${if (exact) "=" else "contains"} '$name'"
   }
 
   fun createFile(name: String, mimeType: MimeType?, parentId: String?): DriveFile = createFile(name) {
@@ -111,8 +192,13 @@ private class GoogleDriveServiceImpl(serviceCreator: ServiceInitializer) : Googl
     .copy(originalId, DriveFile().setName(newName).apply { modification?.invoke(this) })
     .execute()
 
-  fun downloadAsPdf(fileId: String) =
-    ByteArrayOutputStream().apply { service.files().export(fileId, "application/pdf").executeMediaAndDownloadTo(this) }
+  fun downloadAsPdf(fileId: String) = ByteArrayOutputStream()
+    .apply {
+      service
+        .files()
+        .export(fileId, "application/pdf")
+        .executeMediaAndDownloadTo(this)
+    }
 
   /**
    * Fetches all files of the given *[mimeType]*. The function will by default only fetch the

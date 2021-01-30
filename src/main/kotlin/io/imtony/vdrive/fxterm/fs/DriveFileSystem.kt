@@ -5,10 +5,11 @@ import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
 import dispatch.core.IOCoroutineScope
 import dispatch.core.withIO
+import io.imtony.vdrive.fxterm.google.ext.coExecute
 import io.imtony.vdrive.fxterm.google.ext.drive.*
 import io.imtony.vdrive.fxterm.google.services.GoogleDriveService
 import kotlinx.coroutines.*
-import tornadofx.singleAssign
+import tornadofx.*
 import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.*
@@ -92,7 +93,7 @@ class DriveFileSystem private constructor(
           ")"
       )
       .setOrderBy(DriveOrderBy.Folder.add(DriveOrderBy.Name))
-      .executeWithCoroutines()
+      .coExecute(this.scope)
       .files
       .partition { it.mimeType == MimeType.googleFolder.mime }
 

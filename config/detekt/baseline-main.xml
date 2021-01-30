@@ -1,0 +1,290 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues>
+    <ID>WildcardImport:*.kt$import tornadofx.*</ID>
+  </ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>CommentSpacing:io.imtony.vdrive.fxterm.google.services.GoogleSheetsService.kt:15</ID>
+    <ID>ConstructorParameterNaming:CommandProcessor.kt$CommandProcessor$private val FS: DriveFileSystem</ID>
+    <ID>EmptyFunctionBlock:LsCommand.kt$LsCommand${ }</ID>
+    <ID>EndOfSentenceFormat:LockProperty.kt$/** * Convenience property to create a new [LockProperty] */ val lockProperty: LockProperty get() = LockProperty()</ID>
+    <ID>EndOfSentenceFormat:ServiceInitializer.kt$ fun createGsonFactory(): GsonFactory</ID>
+    <ID>EndOfSentenceFormat:ServiceInitializer.kt$ fun createHttpTransport(): NetHttpTransport</ID>
+    <ID>ExpressionBodySyntax:LsCommand.kt$LsCommand$return null</ID>
+    <ID>HasPlatformType:Const.kt$Const.BCrypt.Version$val Instance = at.favre.lib.crypto.bcrypt.BCrypt.Version.VERSION_2A</ID>
+    <ID>ImplicitDefaultLocale:CommandProcessor.kt$CommandProcessor$input.toLowerCase()</ID>
+    <ID>ImplicitDefaultLocale:general.kt$System.getProperty("os.name").toLowerCase()</ID>
+    <ID>ImplicitUnitReturnType:CommandProcessor.kt$CommandProcessor.&lt;no name provided&gt;$override fun write(text: String, fg: Paint, bold: Boolean, italic: Boolean, underline: Boolean, strike: Boolean)</ID>
+    <ID>ImplicitUnitReturnType:CommandProcessor.kt$CommandProcessor.&lt;no name provided&gt;$override fun writeLn(text: String, fg: Paint, bold: Boolean, italic: Boolean, underline: Boolean, strike: Boolean)</ID>
+    <ID>ImplicitUnitReturnType:DriveFileSystem.kt$DriveFileSystem$private suspend fun mapFileList( files: List&lt;DriveFile&gt;, parentPath: Path? = null, isRoot: Boolean = false, createParents: Boolean = false, scope: IOCoroutineScope = IOCoroutineScope(this@DriveFileSystem.scope.coroutineContext) )</ID>
+    <ID>ImplicitUnitReturnType:DriveFileSystem.kt$DriveFileSystem$private suspend fun mapNewRequest( fileList: FileList, parentPath: Path? = null, isRoot: Boolean = false, createParents: Boolean = false, scope: IOCoroutineScope = IOCoroutineScope(this@DriveFileSystem.scope.coroutineContext) )</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.ApplicationName$const val Name = "applicationName"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.ApplicationName$const val Value = "FxTerminal"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.BCrypt.Cost$const val Name = "bcryptCost"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.BCrypt.Cost$const val StringValue = "15"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.BCrypt.Cost$const val Value = 15</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.BCrypt.Version$const val Name = "bcryptVersion"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.BCrypt.Version$const val StringValue = "2A"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.BCrypt.Version$val Instance = at.favre.lib.crypto.bcrypt.BCrypt.Version.VERSION_2A</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.DefaultPort$const val Name = "defaultPort"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.DefaultPort$const val StringValue = "-1"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.DefaultPort$const val Value = -1</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.GoogleScopes$const val Name = "applicationScopes"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.GoogleScopes$val Instance = ApplicationScopes( DriveScopes.DRIVE, DriveScopes.DRIVE_APPDATA, DriveScopes.DRIVE_METADATA, DocsScopes.DOCUMENTS, SheetsScopes.SPREADSHEETS, )</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.TokenDirectory$const val Name = "tokenDir"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Const.kt$Const.TokenDirectory$const val Value = "S:/FastCode/Kotlin/fxterm/tokens/"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Resources.kt$Resources.Creds.Credentials$const val Name = "credsFile"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:Resources.kt$Resources.Creds.Credentials$const val Path = "$base/credentials.json"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:StringUtils.kt$fun String.ensureLineBreak()</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:general.kt$val IS_MAC by lazy { OS.indexOf("mac") &gt;= 0 }</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:general.kt$val IS_NIX by lazy { IS_MAC || IS_UNIX }</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:general.kt$val IS_UNIX by lazy { OS.indexOf("nix") &gt;= 0 || OS.indexOf("nux") &gt;= 0 || OS.indexOf("aix") &gt; 0 }</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:general.kt$val IS_WINDOWS by lazy { OS.indexOf("win") &gt;= 0 }</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:general.kt$val OS by lazy { System.getProperty("os.name").toLowerCase() }</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CommandContext.kt$ fun createCommandContext( logger: Logger, terminalState: TerminalState, google: GoogleServiceCollection, command: String, args: String, output: CommandOutput ): CommandContext</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CommandContext.kt$CommandContext</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CommandOutput.kt$CommandOutput</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CommandProcessor.kt$CommandProcessor</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Const.kt$ApplicationScopes</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Const.kt$fun bcryptVersionFrom(input: String): BCrypt.Version</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ConstStringPrefixer.kt$ConstStringPrefixer : StringConverter</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveCoroutineExt.kt$ @Suppress("HardCodedDispatcher") suspend fun Drive.createFileWithCoroutines( parentId: String, mimeType: String, name: String, context: CoroutineContext = Dispatchers.IO, ): String</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveCoroutineExt.kt$ @Suppress("HardCodedDispatcher") suspend fun Drive.fetchOrCreateAppFolderWithCoroutines( context: CoroutineContext = Dispatchers.IO ): String</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveCoroutineExt.kt$ @Suppress("HardCodedDispatcher") suspend fun Drive.getAppFolder( context: CoroutineContext = Dispatchers.IO ): File?</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveCoroutineExt.kt$ @Suppress("HardCodedDispatcher") suspend fun Drive.queryFilesWithCoroutines( context: CoroutineContext = Dispatchers.IO ): FileList</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveCoroutineExt.kt$ suspend fun Drive.createFileWithCoroutines( parentId: String, mimeType: String, name: String, scope: CoroutineScope, ): String</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveCoroutineExt.kt$ suspend fun Drive.fetchOrCreateAppFolderWithCoroutines( scope: CoroutineScope ): String</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveCorporas.kt$ @Suppress("LongLine") fun DriveService.Files.List.setCorpora(corpora: DriveCorporas): DriveService.Files.List</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveCorporas.kt$ fun DriveService.Files.List.setDefaultCorpora(): DriveService.Files.List</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveCorporas.kt$DriveCorporas</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveFileSystem.kt$DriveFileSystem</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveOrderBy.kt$ fun Drive.Files.List.setOrderBy(vararg keys: DriveOrderBy): Drive.Files.List</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveOrderBy.kt$DriveOrderBy</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ fun ListRequest.buildQ(builder: GoogleDriveQueryBuilder.() -&gt; Unit): ListRequest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ fun ListRequest.buildQuery(builder: GoogleDriveQueryBuilder.() -&gt; Unit): ListRequest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationEquals.doesntEqual(value: Boolean): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationEquals.eq(value: Boolean): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationEquals.eq(value: QueryValue): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationEquals.equals(value: Boolean): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationEquals.equals(value: Float): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationEquals.equals(value: Int): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationEquals.equals(value: Long): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationEquals.notEq(value: Boolean): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationEquals.notEq(value: QueryValue): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationGreaterThan.greaterThan( value: Int ): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationGreaterThan.greaterThan(value: Float): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationGreaterThan.greaterThan(value: Long): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationGreaterThan.gt(value: QueryValue): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationGte.greaterThanOrEqual(value: Float): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationGte.greaterThanOrEqual(value: Int): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationGte.greaterThanOrEqual(value: Long): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationGte.gte(value: QueryValue): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationLessThan.lessThan(value: Float): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationLessThan.lessThan(value: Int): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationLessThan.lessThan(value: Long): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationLessThan.lt(value: QueryValue): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationLte.lessThanOrEqual(value: Float): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationLte.lessThanOrEqual(value: Int): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationLte.lessThanOrEqual(value: Long): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ infix fun QueryOperationLte.lte(value: QueryValue): GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$ContainerQueryOperation : QueryOperationHasQueryTermOperationBase</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$DriveQueryDsl</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$GenericQueryTermOperation : QueryOperationEqualsQueryOperationContainsQueryOperationHasQueryOperationGreaterThanQueryOperationLessThanQueryOperationLteQueryOperationGteQueryTermOperationBase</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$GoogleDriveQuery</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$GoogleDriveQueryBuilder</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$MimeTypeQueryOperation : QueryOperationContainsQueryOperationEqualsQueryTermOperationBase</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$QueryOperation</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$QueryOperationContains : QueryOperation</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$QueryOperationEquals : QueryOperation</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$QueryOperationGreaterThan : QueryOperation</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$QueryOperationGte : QueryOperation</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$QueryOperationHas : QueryOperation</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$QueryOperationLessThan : QueryOperation</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$QueryOperationLte : QueryOperation</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$QueryOperator</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$QueryTerm</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$QueryTermOperationBase : QueryOperation</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveQueryBuilder.kt$QueryValue</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveSpaces.kt$ @Suppress("unused") fun Drive.Files.List.setDefaultSpaces(): Drive.Files.List</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveSpaces.kt$ fun Drive.Files.List.setSpaces(space: DriveSpaces): Drive.Files.List</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveSpaces.kt$ fun Drive.Files.List.setSpaces(spaces: List&lt;DriveSpaces&gt;): Drive.Files.List</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DriveSpaces.kt$DriveSpaces</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FileSystemExt.kt$ fun Path.readDriveId(): String</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FileSystemExt.kt$ fun Path.writeDriveId(file: DriveFile?): Boolean</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FileSystemExt.kt$ fun Path.writeDriveId(id: String?): Boolean</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FileSystemExt.kt$ fun Path.writeDriveMetadata(file: DriveFile): Boolean</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FileSystemExt.kt$ fun Path.writeMimeType(driveFile: DriveFile?): Boolean</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FileSystemExt.kt$ fun Path.writeMimeType(mimeType: MimeType?): Boolean</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FileSystemExt.kt$ fun Path.writeMimeType(mimeType: String?): Boolean</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FileSystemExt.kt$ fun readUserFileAttribute(path: Path, name: String?, checkExists: Boolean, throwIfNotFound: Boolean): String</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FileSystemExt.kt$ fun writeUserFileAttribute(path: Path, name: String?, value: String?): Boolean</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FxTermApp.kt$FxTermApp : App</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GenericService.kt$GenericService&lt;TService : AbstractGoogleJsonClient&gt; : GoogleService</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GenericService.kt$GoogleService&lt;TService : AbstractGoogleJsonClient&gt;</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleCalendarService.kt$GoogleCalendarService : GoogleService</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleClientExt.kt$ fun &lt;T&gt; AbstractGoogleClientRequest&lt;T&gt;.executeAsync( context: CoroutineContext = DispatcherProvider().io ): Deferred&lt;T&gt;</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleClientExt.kt$ fun &lt;T&gt; AbstractGoogleClientRequest&lt;T&gt;.executeAsync( scope: CoroutineScope ): Deferred&lt;T&gt;</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleClientExt.kt$ suspend fun &lt;T&gt; AbstractGoogleClientRequest&lt;T&gt;.coExecute( context: CoroutineContext = DispatcherProvider().io ): T</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleClientExt.kt$ suspend fun &lt;T&gt; AbstractGoogleClientRequest&lt;T&gt;.coExecute( scope: CoroutineScope ): T</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDocsService.kt$ fun GoogleDocsService.createBatchUpdateRequest( vararg requests: DocsRequest ): BatchUpdateDocumentRequest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDocsService.kt$ fun GoogleDocsService.createReplaceTextRequest( findText: String, matchCase: Boolean, replaceText: () -&gt; String ): DocsRequest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDocsService.kt$ fun GoogleDocsService.createReplaceTextRequest( findText: String, matchCase: Boolean, replaceText: String ): DocsRequest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDocsService.kt$ fun GoogleDocsService.createReplaceTextRequestLazy( findText: String, matchCase: Boolean, replaceText: () -&gt; String ): Lazy&lt;DocsRequest&gt;</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDocsService.kt$ fun GoogleDocsService.executeRequests( docId: String, batch: BatchUpdateDocumentRequest ): BatchUpdateDocumentResponse</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDocsService.kt$ fun GoogleDocsService.executeRequests( docId: String, vararg requests: DocsRequest ): BatchUpdateDocumentResponse</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDocsService.kt$ fun GoogleDocsService.getDocument( id: String, ): Document?</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDocsService.kt$ fun GoogleDocsService.getDocumentAsync( id: String, context: CoroutineContext = DispatcherProvider().io ): Deferred&lt;Document?&gt;</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDocsService.kt$ fun GoogleDocsService.getDocumentAsync( id: String, scope: CoroutineScope ): Deferred&lt;Document?&gt;</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDocsService.kt$ suspend fun GoogleDocsService.getDocumentCoroutine( id: String, context: CoroutineContext = DispatcherProvider().io ): Document?</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDocsService.kt$ suspend fun GoogleDocsService.getDocumentCoroutine( id: String, scope: CoroutineScope ): Document?</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDocsService.kt$GoogleDocsService : GoogleService</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDriveService.kt$ fun Drive.Files.List.applyParams(fsp: FileSearchParameters): Drive.Files.List</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDriveService.kt$ fun Drive.Files.List.nameIdAndMax(max: Int): Drive.Files.List</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDriveService.kt$ fun Drive.Files.List.nameMimeIdAndMax(max: Int): Drive.Files.List</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDriveService.kt$ fun Drive.Files.List.onlyNameAndId(): Drive.Files.List</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDriveService.kt$ fun Drive.Files.List.onlyNameMimeAndId(): Drive.Files.List</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDriveService.kt$ fun Drive.Files.List.setDefaults(): Drive.Files.List</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDriveService.kt$ fun Drive.downloadFile(id: String, type: MimeType = MimeType.pdf): ByteArrayOutputStream</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDriveService.kt$FileSearchParameters</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleDriveService.kt$GoogleDriveService : GoogleService</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleServiceCollection.kt$GoogleServiceCollection</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GoogleSheetsService.kt$GoogleSheetsService : GoogleService</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Guard.kt$ @Suppress("NOTHING_TO_INLINE") inline fun &lt;T&gt; T?.valueOrDefault(default: T): T</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Guard.kt$ inline fun &lt;T, TProp&gt; T?.guardProperty(prop: KFunction1&lt;T?, TProp?&gt;?, block: () -&gt; Nothing): T</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Guard.kt$ inline fun &lt;T, TProp&gt; T?.guardProperty(prop: KProperty&lt;TProp?&gt;?, block: () -&gt; Nothing): T</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Guard.kt$ inline fun &lt;T&gt; T?.ifNotNull(block: (T) -&gt; Unit): Unit</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Guard.kt$ inline fun &lt;T&gt; T?.ifNull(block: () -&gt; Unit): Unit</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Guard.kt$ inline infix fun &lt;T&gt; T?.guard(block: () -&gt; Nothing): T</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JimfsExt.kt$ fun File.isJimfs(): Boolean</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JimfsExt.kt$ fun FileSystem.isJimfs(): Boolean</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JimfsExt.kt$ fun FileSystemProvider.isJimfs(): Boolean</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JimfsExt.kt$ fun Path.isJimfs(): Boolean</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LockProperty.kt$LockProperty</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LsCommand.kt$LsCommand : TerminalCommand</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Main.kt$fun main(): Unit</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MainView.kt$MainView : ViewCoroutineScope</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MimeType.kt$ fun DriveFile.isDriveFile(): Boolean</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MimeType.kt$ fun DriveFile.isDriveFolder(): Boolean</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MimeType.kt$ fun DriveFile.isDriveShortcut(): Boolean</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MimeType.kt$ fun String.asMimeType(): MimeType</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MimeType.kt$MimeCategory : MimeType</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MimeType.kt$MimeType</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PrefixedString.kt$PrefixedString</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ServiceInitializer.kt$ fun createCredentials( httpTrans: HttpTransport, gsonFac: GsonFactory, applicationScopes: ApplicationScopes, credInputFile: String, tokenOutputDir: String, localPort: Int, ): Credential</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ServiceInitializer.kt$ fun createGsonFactory(): GsonFactory</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ServiceInitializer.kt$ fun createHttpTransport(): NetHttpTransport</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ServiceInitializer.kt$ServiceInitializer</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ServiceInitializer.kt$fun createServiceInitializer( httpTransport: HttpTransport, gsonFactory: GsonFactory, credentials: Credential, appName: String, ): ServiceInitializer</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SheetsMajorDimension.kt$ fun Sheets.Spreadsheets.Values.BatchGet.setMajorDimension( smd: SheetsMajorDimension ): Sheets.Spreadsheets.Values.BatchGet</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SheetsMajorDimension.kt$ fun Sheets.Spreadsheets.Values.Get.setMajorDimension( smd: SheetsMajorDimension ): Sheets.Spreadsheets.Values.Get</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SheetsMajorDimension.kt$SheetsMajorDimension</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:StringUtils.kt$fun String.ensureLineBreak()</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:TerminalCommand.kt$/** * Convenience alias for terminal command clean-up function (dispose) * returned from [TerminalCommand.execute]. * (TerminalCommand) -&gt; Unit */ typealias CommandCleanup = suspend (TerminalCommand) -&gt; Unit</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:TerminalCommand.kt$TerminalCommand</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:TerminalState.kt$TerminalState</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ValueRangeExt.kt$ fun ValueRange.asAnyAnyList(ignoreFirstRow: Boolean = true): List&lt;List&lt;Any?&gt;&gt;</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ValueRangeExt.kt$ fun ValueRange.asAnyAnyMutableList(ignoreFirstRow: Boolean = true): MutableList&lt;MutableList&lt;Any?&gt;&gt;</ID>
+    <ID>MagicNumber:CommandProcessor.kt$CommandProcessor$120</ID>
+    <ID>MagicNumber:CommandProcessor.kt$CommandProcessor$132</ID>
+    <ID>MagicNumber:CommandProcessor.kt$CommandProcessor$199</ID>
+    <ID>MagicNumber:CommandProcessor.kt$CommandProcessor$247</ID>
+    <ID>MagicNumber:CommandProcessor.kt$CommandProcessor$248</ID>
+    <ID>MagicNumber:CommandProcessor.kt$CommandProcessor$250</ID>
+    <ID>MagicNumber:CommandProcessor.kt$CommandProcessor$63</ID>
+    <ID>MagicNumber:CommandProcessor.kt$CommandProcessor$80</ID>
+    <ID>MagicNumber:CommandProcessor.kt$CommandProcessor$91</ID>
+    <ID>NoBlankLineBeforeRbrace:io.imtony.vdrive.fxterm.commands.ls.LsCommand.kt:23</ID>
+    <ID>NoBlankLineBeforeRbrace:io.imtony.vdrive.fxterm.google.services.ServiceInitializer.kt:155</ID>
+    <ID>NoConsecutiveBlankLines:io.imtony.vdrive.fxterm.commands.CommandProcessor.kt:82</ID>
+    <ID>NoConsecutiveBlankLines:io.imtony.vdrive.fxterm.commands.ls.LsCommand.kt:28</ID>
+    <ID>NoConsecutiveBlankLines:io.imtony.vdrive.fxterm.fs.JimfsExt.kt:9</ID>
+    <ID>NoConsecutiveBlankLines:io.imtony.vdrive.fxterm.google.ext.GoogleClientExt.kt:27</ID>
+    <ID>NoConsecutiveBlankLines:io.imtony.vdrive.fxterm.google.services.GoogleSheetsService.kt:53</ID>
+    <ID>NoConsecutiveBlankLines:io.imtony.vdrive.fxterm.utils.general.kt:11</ID>
+    <ID>NoUnitReturn:io.imtony.vdrive.fxterm.Main.kt:5</ID>
+    <ID>NoUnitReturn:io.imtony.vdrive.fxterm.commands.CommandProcessor.kt:126</ID>
+    <ID>NoUnitReturn:io.imtony.vdrive.fxterm.commands.CommandProcessor.kt:138</ID>
+    <ID>NoUnitReturn:io.imtony.vdrive.fxterm.utils.Guard.kt:53</ID>
+    <ID>NoUnitReturn:io.imtony.vdrive.fxterm.utils.Guard.kt:66</ID>
+    <ID>NoUnusedImports:io.imtony.vdrive.fxterm.google.ext.drive.DriveCoroutineExt.kt:6</ID>
+    <ID>NullableToStringCall:CommandProcessor.kt$CommandProcessor$${LocalDateTime.now().format(timestampFormat)}</ID>
+    <ID>NullableToStringCall:DriveQueryBuilder.kt$GoogleDriveQueryBuilder$$query</ID>
+    <ID>NullableToStringCall:DriveQueryBuilder.kt$GoogleDriveQueryBuilder$fileTime.toString()</ID>
+    <ID>NullableToStringCall:DriveQueryBuilder.kt$GoogleDriveQueryBuilder$query.toString()</ID>
+    <ID>NullableToStringCall:DriveQueryBuilder.kt$QueryValue$${StringEscapeUtils.escapeJava(value)}</ID>
+    <ID>NullableToStringCall:FileSystemExt.kt$$name</ID>
+    <ID>NullableToStringCall:FileSystemExt.kt$$value</ID>
+    <ID>OptionalUnit:CommandOutput.kt$CommandOutput$Unit</ID>
+    <ID>OptionalUnit:CommandProcessor.kt$CommandProcessor$Unit</ID>
+    <ID>OptionalUnit:Guard.kt$Unit</ID>
+    <ID>OptionalUnit:LockProperty.kt$LockProperty$Unit</ID>
+    <ID>OptionalUnit:Main.kt$Unit</ID>
+    <ID>PrintStackTrace:DriveFileSystem.kt$DriveFileSystem$logged</ID>
+    <ID>RedundantSuspendModifier:CommandProcessor.kt$CommandProcessor$suspend</ID>
+    <ID>StringTemplate:io.imtony.vdrive.fxterm.MainView.kt:51</ID>
+    <ID>TopLevelPropertyNaming:StringUtils.kt$internal const val empty_: String = ""</ID>
+    <ID>TopLevelPropertyNaming:StringUtils.kt$internal const val nixEnding = "\n"</ID>
+    <ID>TopLevelPropertyNaming:StringUtils.kt$internal const val windowsEnding = "\r\n"</ID>
+    <ID>UndocumentedPublicClass:CommandOutput.kt$CommandOutput</ID>
+    <ID>UndocumentedPublicClass:Const.kt$Const</ID>
+    <ID>UndocumentedPublicClass:Const.kt$Const$ApplicationName</ID>
+    <ID>UndocumentedPublicClass:Const.kt$Const$BCrypt</ID>
+    <ID>UndocumentedPublicClass:Const.kt$Const$DefaultPort</ID>
+    <ID>UndocumentedPublicClass:Const.kt$Const$GoogleScopes</ID>
+    <ID>UndocumentedPublicClass:Const.kt$Const$TokenDirectory</ID>
+    <ID>UndocumentedPublicClass:Const.kt$Const.BCrypt$Cost</ID>
+    <ID>UndocumentedPublicClass:Const.kt$Const.BCrypt$Version</ID>
+    <ID>UndocumentedPublicClass:FxTermApp.kt$FxTermApp : App</ID>
+    <ID>UndocumentedPublicClass:GlobalStyles.kt$GlobalStyles : Stylesheet</ID>
+    <ID>UndocumentedPublicClass:GoogleServiceCollection.kt$GoogleServiceCollection</ID>
+    <ID>UndocumentedPublicClass:GoogleSheetsService.kt$GoogleSheetsService : GoogleService</ID>
+    <ID>UndocumentedPublicClass:LsCommand.kt$LsCommand : TerminalCommand</ID>
+    <ID>UndocumentedPublicClass:LsCommand.kt$LsCommand$LsState</ID>
+    <ID>UndocumentedPublicClass:MainView.kt$MainView : ViewCoroutineScope</ID>
+    <ID>UndocumentedPublicClass:Resources.kt$Resources</ID>
+    <ID>UndocumentedPublicClass:Resources.kt$Resources$Creds</ID>
+    <ID>UndocumentedPublicClass:Resources.kt$Resources.Creds$Credentials</ID>
+    <ID>UndocumentedPublicClass:ServiceInitializer.kt$ServiceInitializer</ID>
+    <ID>UndocumentedPublicClass:TerminalCommand.kt$TerminalCommand</ID>
+    <ID>UndocumentedPublicClass:TerminalState.kt$TerminalState</ID>
+    <ID>UndocumentedPublicFunction:CommandOutput.kt$CommandOutput$fun write( text: String, fg: Paint = Color.WHITESMOKE, bold: Boolean = false, italic: Boolean = false, underline: Boolean = false, strike: Boolean = false, ): Unit</ID>
+    <ID>UndocumentedPublicFunction:CommandOutput.kt$CommandOutput$fun writeLn( text: String, fg: Paint = Color.WHITESMOKE, bold: Boolean = false, italic: Boolean = false, underline: Boolean = false, strike: Boolean = false, ): Unit</ID>
+    <ID>UndocumentedPublicFunction:CommandProcessor.kt$CommandProcessor$fun runLs(output: ObservableList&lt;Text&gt;)</ID>
+    <ID>UndocumentedPublicFunction:CommandProcessor.kt$CommandProcessor$suspend fun processCommand(input: String, lock: LockProperty, output: ObservableList&lt;Text&gt;)</ID>
+    <ID>UndocumentedPublicFunction:Const.kt$fun bcryptVersionFrom(input: String): BCrypt.Version</ID>
+    <ID>UndocumentedPublicFunction:GoogleServiceCollection.kt$GoogleServiceCollection.Companion$fun createDefault( serviceInitializer: ServiceInitializer = ServiceInitializer.createDefault() ): GoogleServiceCollection</ID>
+    <ID>UndocumentedPublicFunction:GoogleSheetsService.kt$GoogleSheetsService.Companion$fun create(serviceInitializer: ServiceInitializer): GoogleSheetsService</ID>
+    <ID>UndocumentedPublicFunction:Main.kt$fun main(): Unit</ID>
+    <ID>UndocumentedPublicFunction:ServiceInitializer.kt$ServiceInitializer$fun createCalendar(): Calendar</ID>
+    <ID>UndocumentedPublicFunction:ServiceInitializer.kt$ServiceInitializer.Companion$fun createDefault(): ServiceInitializer</ID>
+    <ID>UndocumentedPublicFunction:ServiceInitializer.kt$fun createServiceInitializer( httpTransport: HttpTransport, gsonFactory: GsonFactory, credentials: Credential, appName: String, ): ServiceInitializer</ID>
+    <ID>UndocumentedPublicFunction:StringUtils.kt$fun String.ensureLineBreak()</ID>
+    <ID>UndocumentedPublicProperty:GoogleServiceCollection.kt$GoogleServiceCollection$val calendar: GoogleCalendarService</ID>
+    <ID>UndocumentedPublicProperty:GoogleServiceCollection.kt$GoogleServiceCollection$val docs: GoogleDocsService</ID>
+    <ID>UndocumentedPublicProperty:GoogleServiceCollection.kt$GoogleServiceCollection$val drive: GoogleDriveService</ID>
+    <ID>UndocumentedPublicProperty:GoogleServiceCollection.kt$GoogleServiceCollection$val sheets: GoogleSheetsService</ID>
+    <ID>UndocumentedPublicProperty:LsCommand.kt$LsCommand.LsState$val ctx: CommandContext</ID>
+    <ID>UndocumentedPublicProperty:PrefixedString.kt$PrefixedString$val valueBinding: StringBinding get() = boundValue</ID>
+    <ID>UndocumentedPublicProperty:TerminalState.kt$TerminalState$val commandHistory: List&lt;String&gt;</ID>
+    <ID>UndocumentedPublicProperty:TerminalState.kt$TerminalState$val cwd: Path</ID>
+    <ID>UndocumentedPublicProperty:general.kt$val IS_MAC by lazy { OS.indexOf("mac") &gt;= 0 }</ID>
+    <ID>UndocumentedPublicProperty:general.kt$val IS_NIX by lazy { IS_MAC || IS_UNIX }</ID>
+    <ID>UndocumentedPublicProperty:general.kt$val IS_UNIX by lazy { OS.indexOf("nix") &gt;= 0 || OS.indexOf("nux") &gt;= 0 || OS.indexOf("aix") &gt; 0 }</ID>
+    <ID>UndocumentedPublicProperty:general.kt$val IS_WINDOWS by lazy { OS.indexOf("win") &gt;= 0 }</ID>
+    <ID>UndocumentedPublicProperty:general.kt$val OS by lazy { System.getProperty("os.name").toLowerCase() }</ID>
+    <ID>UnnecessaryAbstractClass:GenericService.kt$GenericService&lt;TService : AbstractGoogleJsonClient&gt; : GoogleService</ID>
+    <ID>UnnecessaryParentheses:CommandProcessor.kt$CommandProcessor$(lsNum - dirNum)</ID>
+    <ID>UnusedImports:DriveCoroutineExt.kt$import com.google.api.services.drive.DriveRequest</ID>
+    <ID>UseDataClass:LsCommand.kt$LsCommand$LsState</ID>
+    <ID>VariableNaming:MainView.kt$MainView$private var DFS: DriveFileSystem by singleAssign()</ID>
+    <ID>WildcardImport:DriveCoroutineExt.kt$import kotlinx.coroutines.*</ID>
+    <ID>WildcardImport:DriveFileSystem.kt$import io.imtony.vdrive.fxterm.google.ext.drive.*</ID>
+    <ID>WildcardImport:DriveFileSystem.kt$import java.nio.file.*</ID>
+    <ID>WildcardImport:DriveFileSystem.kt$import java.nio.file.attribute.*</ID>
+    <ID>WildcardImport:DriveFileSystem.kt$import kotlin.io.path.*</ID>
+    <ID>WildcardImport:DriveFileSystem.kt$import kotlinx.coroutines.*</ID>
+    <ID>WildcardImport:GoogleDocsService.kt$import com.google.api.services.docs.v1.model.*</ID>
+    <ID>WildcardImport:GoogleDriveService.kt$import io.imtony.vdrive.fxterm.google.ext.drive.*</ID>
+    <ID>WildcardImport:MainView.kt$import tornadofx.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

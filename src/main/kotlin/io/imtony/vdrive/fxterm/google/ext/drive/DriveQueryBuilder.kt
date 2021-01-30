@@ -2,6 +2,7 @@
 
 package io.imtony.vdrive.fxterm.google.ext.drive
 
+import mu.KLogging
 import org.apache.commons.text.StringEscapeUtils
 import java.nio.file.attribute.FileTime
 import com.google.api.services.drive.Drive.Files.List as ListRequest
@@ -113,7 +114,7 @@ private abstract class ConditionalBinaryQuery(
   protected fun ensureNotEmpty(f: GoogleDriveQuery, s: GoogleDriveQuery): String? {
     val fEmpty = f == EmptyQuery
     val sEmpty = s == EmptyQuery
-    // println("Generating And Query.\nFirst: $f Second: $s\nFirstEmpty: $fEmpty SecondEmpty: $sEmpty")
+
     if (fEmpty && sEmpty) {
       return ""
     }
@@ -187,12 +188,14 @@ interface QueryOperation {
     value: QueryValue
   ): GoogleDriveQuery = SingleGoogleDriveQuery(term, op, value).also {
     if (builder == null) {
-      println("No builder to add '$it' to.")
+      logger.warn { "No builder to add '$it' to." }
     } else {
-      if (builder?.logging == true) println("Adding '$it' to builder '$builder'")
+      if (builder?.logging == true) logger.info("Adding '$it' to builder '$builder'")
     }
     builder?.addQuery(it)
   }
+
+  companion object : KLogging()
 }
 
 /**
@@ -479,7 +482,7 @@ open class GoogleDriveQueryBuilder(
    * #### This function should not be used during query building.
    */
   open fun addQuery(q: GoogleDriveQuery) {
-    if (logging) println("MasterBuilder: Adding '$q'.${if (query != null) "" else "Replacing '$query'."}")
+    if (logging) logger.info { "MasterBuilder: Adding '$q'.${if (query != null) "" else "Replacing '$query'."}" }
     query = q
   }
 
@@ -711,14 +714,16 @@ open class GoogleDriveQueryBuilder(
   }
 
   override fun toString(): String = "MasterBuilder [${if (query != null) query.toString() else "No Query"}]"
+
+  companion object : KLogging()
 }
 
 private class GroupedQueryBuilder : GoogleDriveQueryBuilder() {
   override fun asRawQuery(): GoogleDriveQuery = GroupedDriveQuery(super.asRawQuery())
-    .also { if (logging) println("GroupBuilder: Finished Query: $it") }
+    .also { if (logging) logger.info("GroupBuilder: Finished Query: $it") }
 
   override fun addQuery(q: GoogleDriveQuery) {
-    if (logging) println("GroupBuilder: Adding '$q'.")
+    if (logging) logger.info("GroupBuilder: Adding '$q'.")
     super.addQuery(q)
   }
 
@@ -729,14 +734,14 @@ private class AndQueryBuilder : GoogleDriveQueryBuilder() {
   private val queries: MutableList<GoogleDriveQuery> = mutableListOf()
 
   override fun addQuery(q: GoogleDriveQuery) {
-    if (logging) println("AndBuilder: Adding '$q'. Current = [${queries.joinToString(" and ")}]")
+    if (logging) logger.info("AndBuilder: Adding '$q'. Current = [${queries.joinToString(" and ")}]")
     queries.add(q)
   }
 
   override fun asRawQuery(): GoogleDriveQuery = queries.reduce { ex, new ->
-    if (logging) println("Gathering And Queries. ${queries.size} queries: ${queries.joinToString(" and ")}")
+    if (logging) logger.info("Gathering And Queries. ${queries.size} queries: ${queries.joinToString(" and ")}")
     AndDriveQuery(ex, new)
-  }.also { if (logging) println("AndBuilder: Finished Query: $it") }
+  }.also { if (logging) logger.info("AndBuilder: Finished Query: $it") }
 
   override fun toString(): String =
     "AndBuilder [${if (queries.isNotEmpty()) queries.joinToString(", ") else "No Queries"}]"
@@ -746,14 +751,14 @@ private class OrQueryBuilder : GoogleDriveQueryBuilder() {
   private val queries: MutableList<GoogleDriveQuery> = mutableListOf()
 
   override fun addQuery(q: GoogleDriveQuery) {
-    if (logging) println("OrBuilder: Adding '$q'. Current = [${queries.joinToString(" or ")}]")
+    if (logging) logger.info("OrBuilder: Adding '$q'. Current = [${queries.joinToString(" or ")}]")
     queries.add(q)
   }
 
   override fun asRawQuery(): GoogleDriveQuery = queries.reduce { ex, new ->
-    if (logging) println("Gathering Or Queries. ${queries.size} queries: ${queries.joinToString(" or ")}")
+    if (logging) logger.info("Gathering Or Queries. ${queries.size} queries: ${queries.joinToString(" or ")}")
     OrDriveQuery(ex, new)
-  }.also { if (logging) println("OrBuilder: Finished Query: $it") }
+  }.also { if (logging) logger.info("OrBuilder: Finished Query: $it") }
 
   override fun toString(): String =
     "OrBuilder [${if (queries.isNotEmpty()) queries.joinToString(", ") else "No Queries"}]"

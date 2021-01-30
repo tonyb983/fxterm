@@ -5,6 +5,7 @@
     <enableFormatting>true</enableFormatting>
     <enableAllRules>true</enableAllRules>
     <rulesPath>S:\FastCode\Kotlin\fxterm\config\detekt\detekt.yml</rulesPath>
+    <baselinePath>S:\FastCode\Kotlin\fxterm\config\detekt\baseline-main.xml</baselinePath>
     <pluginPaths>S:\Library\DetektJars\detekt-formatting-1.16.0-RC1.jar;S:\Library\DetektJars\dispatch-detekt-1.0.0-beta08.jar</pluginPaths>
   </component>
 </project>
