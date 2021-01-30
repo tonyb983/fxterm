@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Build Files" pattern="file[fxterm]:*/" />
+</component>

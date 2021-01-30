@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Code Files" pattern="file[fxterm*]:*//*&amp;&amp;!file[fxterm]:.idea/*&amp;&amp;!file[fxterm]:.idea/inspectionProfiles/*&amp;&amp;!file[fxterm]:.idea/modules/*&amp;&amp;!file[fxterm]:config/detekt/*&amp;&amp;!file[fxterm]:gradle/wrapper/*&amp;&amp;!file[fxterm]:tokens/*" />
+</component>
