@@ -6,6 +6,8 @@
 
 job("Run Qodana") {
  	container("jetbrains/qodana:2020.3-eap") {
-        args("-v ${}:/data/project -v ${GITHUB_WORKSPACE}/qodana:/data/results --save-report")
+      mountDir = "/"
+      workDir = "/data"
+      args("--save-report")
     }
 }

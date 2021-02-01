@@ -1,36 +1,134 @@
 package io.imtony.vdrive.fxterm.google.ext.drive
 
-import com.google.api.client.json.GenericJson
 import com.google.api.services.drive.Drive
+import com.google.api.services.drive.DriveRequest
+import com.google.api.services.drive.model.About
+import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.FileList
-import io.imtony.vdrive.fxterm.utils.ifNotNull
+import com.google.api.services.drive.model.User
 import mu.KLogging
-import java.beans.Introspector
-import kotlin.reflect.KFunction1
-import kotlin.reflect.KProperty1
-import kotlin.reflect.jvm.javaMethod
 
 interface GeneralBuilder {
   val finalValue: String
 }
 
 interface DriveRequestFieldsBuilder : GeneralBuilder, AutoCloseable {
-  fun addQuery(input: String): Boolean
+  fun addQuery(input: String?): Boolean
+}
+
+interface GenericFieldBuilder<TTarget, TThis : GenericFieldBuilder<TTarget, TThis>> : DriveRequestFieldsBuilder {
+  fun addFields(block: TThis.() -> Unit): Unit
+}
+
+open class BaseFieldBuilder<TTarget, TBuilder : BaseFieldBuilder<TTarget, TBuilder>>(
+  protected val targetClass: Class<TTarget>,
+  protected val builderClass: Class<TBuilder>,
+  protected val groupPrefix: String? = null,
+  protected val owner: DriveRequestFieldsBuilder? = null,
+) :
+  GenericFieldBuilder<TTarget, TBuilder> {
+  constructor(
+    targetClass: Class<TTarget>,
+    builderClass: Class<TBuilder>,
+    groupPrefix: String? = null,
+    owner: DriveRequestFieldsBuilder? = null,
+    block: TBuilder.() -> Unit
+  ) : this(targetClass, builderClass, groupPrefix, owner) {
+    addFields(block)
+  }
+
+  protected val queries: MutableSet<String> = mutableSetOf()
+
+  override val finalValue: String
+    get() = if (queries.isEmpty()) "" else {
+      if (groupPrefix != null) {
+        "$groupPrefix(${queries.joinToString(",")})"
+      } else {
+        queries.joinToString(",")
+      }
+    }
+
+  override fun addFields(block: TBuilder.() -> Unit) {
+    block.invoke(this as? TBuilder ?: throw TypeCastException("'this' cannot be cast to type ${builderClass.simpleName}"))
+  }
+
+  override fun addQuery(input: String?): Boolean = if (input.isNullOrBlank()) {
+    false
+  } else {
+    queries.add(input)
+  }
+
+  protected var isClosed = false
+
+  override fun close() {
+    val alreadyClosed = !isClosed
+    val queriesEmpty = queries.isEmpty()
+    val ownerNull = owner == null
+
+    if (alreadyClosed || queriesEmpty || ownerNull) {
+      logger.warn { "Warning, unable to run close. alreadyClosed: $alreadyClosed queriesEmpty: $queriesEmpty ownerNull: $ownerNull" }
+      return
+    }
+
+    owner!!.addQuery(finalValue)
+    isClosed = true
+  }
+
+  companion object : KLogging()
+}
+
+class DriveFilesListFieldBuilder(
+  owner: DriveRequestFieldsBuilder? = null,
+) : BaseFieldBuilder<FileList, DriveFilesListFieldBuilder>(
+  FileList::class.java,
+  DriveFilesListFieldBuilder::class.java,
+  null,
+  owner,
+) {
+  constructor(
+    owner: DriveRequestFieldsBuilder? = null,
+    block: DriveFilesListFieldBuilder.() -> Unit
+  ) : this(owner) {
+    addFields(block)
+  }
+
+  companion object : KLogging()
+}
+
+
+inline fun <reified TModel, reified TBuilder : BaseFieldBuilder<TModel, TBuilder>> fieldBuilderFactory(
+  owner: DriveRequestFieldsBuilder? = null,
+  groupPrefix: String? = null,
+  noinline block: TBuilder.() -> Unit
+): TBuilder? = when {
+  TModel::class.java == Drive.Files.List::class.java &&
+    TBuilder::class.java == DriveFilesListRequestFieldsBuilder::class.java -> DriveFilesListRequestFieldsBuilder(
+    owner
+  ) as TBuilder
+  TModel::class.java == File::class.java &&
+    TBuilder::class.java == DriveFilesListRequestFieldsBuilder::class.java -> DriveFileFieldBuilder(
+    owner
+  ) as TBuilder
+
+  else -> null
+}
+
+inline fun <reified TModel, reified TBuilder : BaseFieldBuilder<TModel, TBuilder>> fieldBuilderFactory(
+): TBuilder? = when {
+  TModel::class.java == Drive.Files.List::class.java -> DriveFilesListRequestFieldsBuilder() as TBuilder
+  TModel::class.java == File::class.java -> DriveFileFieldBuilder() as TBuilder
+
+  else -> null
 }
 
 class DriveFilesListRequestFieldsBuilder(
-  private val owner: DriveRequestFieldsBuilder? = null
-) : DriveRequestFieldsBuilder {
-  private var queryParts: MutableSet<String> = mutableSetOf()
-
-  override val finalValue get() = queryParts.joinToString(",")
-
-  override fun addQuery(input: String): Boolean = queryParts.add(input)
-
-  override fun close() {
-    owner?.addQuery(finalValue)
-  }
-
+  owner: DriveRequestFieldsBuilder? = null
+) : BaseFieldBuilder<Drive.Files.List, DriveFilesListRequestFieldsBuilder>(
+  Drive.Files.List::class.java,
+  DriveFilesListRequestFieldsBuilder::class.java,
+  null,
+  owner,
+) {
   val nextPageToken: Boolean get() = addQuery("nextPageToken")
 
   fun maxResults(max: Int): Boolean {
@@ -48,131 +146,14 @@ class DriveFilesListRequestFieldsBuilder(
   companion object : KLogging()
 }
 
-interface PropertyBuilder<TTarget, TThis : PropertyBuilder<TTarget, TThis>> : DriveRequestFieldsBuilder {
-  fun build(block: TThis.() -> Unit): Unit
-}
-
-open class PropertyBuilderImpl<T>(
-  private val targetClass: Class<T>,
-  private val groupPrefix: String? = null,
-  private val owner: DriveRequestFieldsBuilder? = null,
-) : PropertyBuilder<T, PropertyBuilderImpl<T>> {
-
-  constructor(
-    targetClass: Class<T>,
-    groupPrefix: String? = null,
-    owner: DriveRequestFieldsBuilder? = null,
-    initBlock: PropertyBuilderImpl<T>.() -> Unit = {},
-  ) : this(targetClass, groupPrefix, owner) {
-    build(initBlock)
-  }
-
-  private val beanInfo by lazy { Introspector.getBeanInfo(targetClass, GenericJson::class.java) }
-  private val queries: MutableSet<String> = mutableSetOf()
-
-  override val finalValue: String
-    get() = if (queries.isEmpty()) "" else {
-      if (groupPrefix.isNullOrBlank()) {
-        queries.joinToString(",")
-      }else {
-        "$groupPrefix(${queries.joinToString(",")})"
-      }
-    }
-
-  override fun build(block: PropertyBuilderImpl<T>.() -> Unit) {
-    block.invoke(this)
-  }
-
-  override fun addQuery(input: String): Boolean {
-    if (input.isNotBlank() && input !in queries) {
-      return queries.add(input)
-    }
-
-    return false
-  }
-
-  fun <TValue> addField(prop: KProperty1<T, TValue>) {
-    val name = if (prop is KProperty1.Getter<*, *>) {
-      prop.name.removePrefix("<get-").removeSuffix(">")
-    } else {
-      prop.name
-    }
-
-    logger.info { "Found name '$name' from KProperty1 '$prop'." }
-    addQuery(name)
-  }
-
-  fun <TValue> addField(getter: KFunction1<T, MutableList<TValue>>) {
-    val jm = getter.javaMethod
-    if (jm == null) {
-      val msg = "Could not get javaMethod for getter: '$getter'"
-      logger.error { msg }
-      throw IllegalArgumentException(msg)
-    }
-
-    val pd = beanInfo.propertyDescriptors.firstOrNull { it.writeMethod == jm || it.readMethod == jm }
-
-    if (pd == null) {
-      val msg = "No propertyDescriptor found with read or write methods matching '$jm'."
-      logger.error { msg }
-      throw IllegalArgumentException(msg)
-    }
-
-    addQuery(pd.name)
-  }
-
-  override fun close() {
-    owner.ifNotNull {
-      it.addQuery(finalValue)
-    }
-  }
-
-  companion object : KLogging() {
-    inline fun <reified T> new(
-      owner: DriveRequestFieldsBuilder? = null,
-      groupPrefix: String? = null,
-      noinline initBlock: PropertyBuilderImpl<T>.() -> Unit = {}
-    ): PropertyBuilder<T, PropertyBuilderImpl<T>> = PropertyBuilderImpl(T::class.java, groupPrefix, owner, initBlock)
-  }
-}
-
-class FilesListPropertyBuilder(
-  owner: DriveRequestFieldsBuilder? = null,
-) : PropertyBuilderImpl<FileList>(FileList::class.java, null, owner) {
-  constructor(owner: DriveRequestFieldsBuilder? = null, block: FilesListPropertyBuilder.() -> Unit) : this(owner) {
-  }
-
-  override fun build(block: PropertyBuilderImpl<FileList>.() -> Unit) {
-    block.invoke(this)
-  }
-
-  companion object : KLogging() {
-    inline fun <reified T> new(
-      owner: DriveRequestFieldsBuilder? = null,
-      groupPrefix: String? = null,
-      noinline initBlock: FilesListPropertyBuilder.() -> Unit = {}
-    ): FilesListPropertyBuilder = FilesListPropertyBuilder()
-  }
-}
-
-private fun tester() {
-  FilesListPropertyBuilder
-}
-
-class DriveFileFieldBuilder(private val owner: DriveRequestFieldsBuilder? = null) : DriveRequestFieldsBuilder {
-  private val queries: MutableList<String> = mutableListOf()
-
-  override val finalValue: String
-    get() = if (queries.isEmpty()) "" else "files(${queries.joinToString(",")}})"
-
-  override fun addQuery(input: String): Boolean =
-    if (queries.contains(input)) {
-      logger.warn { "Cannot add same field twice. Input: $input" }
-      false
-    } else {
-      queries.add(input)
-    }
-
+class DriveFileFieldBuilder(
+  owner: DriveRequestFieldsBuilder? = null
+) : BaseFieldBuilder<File, DriveFileFieldBuilder>(
+  File::class.java,
+  DriveFileFieldBuilder::class.java,
+  "files",
+  owner
+) {
   val id: Boolean get() = addQuery("id")
   val name: Boolean get() = addQuery("name")
   val mimeType: Boolean get() = addQuery("mimeType")
@@ -181,7 +162,9 @@ class DriveFileFieldBuilder(private val owner: DriveRequestFieldsBuilder? = null
   val trashed: Boolean get() = addQuery("trashed")
   val explicitlyTrashed: Boolean get() = addQuery("explicitlyTrashed")
 
-  // trashingUser
+  fun trashingUser(block: DriveUserFieldBuilder.() -> Unit) {
+    DriveUserFieldBuilder("trashingUser", this).use(block)
+  }
 
   val trashedTime: Boolean get() = addQuery("trashedTime")
   val parents: Boolean get() = addQuery("parents")
@@ -203,18 +186,24 @@ class DriveFileFieldBuilder(private val owner: DriveRequestFieldsBuilder? = null
   val modifiedByMe: Boolean get() = addQuery("modifiedByMe")
   val sharedWithMeTime: Boolean get() = addQuery("sharedWithMeTime")
 
-  // sharingUser
+  fun sharingUser(block: DriveUserFieldBuilder.() -> Unit) {
+    DriveUserFieldBuilder("sharingUser", this).use(block)
+  }
 
   val owners: Boolean get() = addQuery("owners")
   val teamDriveId: Boolean get() = addQuery("teamDriveId")
   val driveId: Boolean get() = addQuery("driveId")
 
-  // lastModifyingUser
+  fun lastModifyingUser(block: DriveUserFieldBuilder.() -> Unit) {
+    DriveUserFieldBuilder("lastModifyingUser", this).use(block)
+  }
 
   val shared: Boolean get() = addQuery("shared")
   val ownedByMe: Boolean get() = addQuery("ownedByMe")
 
-  // capabilities
+  fun capabilities(block: DriveFileCapabilitiesFieldBuilder.() -> Unit) {
+    DriveFileCapabilitiesFieldBuilder(owner = this).use(block)
+  }
 
   val viewersCanCopyContent: Boolean get() = addQuery("viewersCanCopyContent")
   val copyRequiresWriterPermission: Boolean get() = addQuery("copyRequiresWriterPermission")
@@ -235,6 +224,9 @@ class DriveFileFieldBuilder(private val owner: DriveRequestFieldsBuilder? = null
 
   // contentHints
   // imageMediaMetadata
+  fun imageMediaMetadata(block: DriveFileImageMediaMetadataFieldBuilder.() -> Unit) {
+    DriveFileImageMediaMetadataFieldBuilder(owner = this).use(block)
+  }
   // videoMediaMetadata
 
   val isAppAuthorized: Boolean get() = addQuery("isAppAuthorized")
@@ -269,22 +261,220 @@ class DriveFileFieldBuilder(private val owner: DriveRequestFieldsBuilder? = null
   }
   // contentRestrictions
 
-  override fun close() {
-    owner?.addQuery(finalValue)
-  }
+  companion object : KLogging()
+}
+
+class DriveUserFieldBuilder(
+  grouping: String = "user",
+  owner: DriveRequestFieldsBuilder? = null
+) : BaseFieldBuilder<User, DriveUserFieldBuilder>(
+  User::class.java,
+  DriveUserFieldBuilder::class.java,
+  grouping,
+  owner
+) {
+  val displayName: Boolean get() = addQuery("displayName")
+  val emailAddress: Boolean get() = addQuery("emailAddress")
+  val kind: Boolean get() = addQuery("kind")
+  val me: Boolean get() = addQuery("me")
+  val permissionId: Boolean get() = addQuery("permissionId")
+  val photoLink: Boolean get() = addQuery("photoLink")
 
   companion object : KLogging()
 }
 
+class DriveFileCapabilitiesFieldBuilder(
+  grouping: String = "capabilities",
+  owner: DriveRequestFieldsBuilder? = null
+) : BaseFieldBuilder<File.Capabilities, DriveFileCapabilitiesFieldBuilder>(
+  File.Capabilities::class.java,
+  DriveFileCapabilitiesFieldBuilder::class.java,
+  grouping,
+  owner
+) {
+  val canAddChildren: Boolean get() = addQuery("canAddChildren")
+  val canAddMyDriveParent: Boolean get() = addQuery("canAddMyDriveParent")
+  val canChangeCopyRequiresWriterPermission: Boolean get() = addQuery("canChangeCopyRequiresWriterPermission")
+  val canChangeViewersCanCopyContent: Boolean get() = addQuery("canChangeViewersCanCopyContent")
+  val canComment: Boolean get() = addQuery("canComment")
+  val canCopy: Boolean get() = addQuery("canCopy")
+  val canDelete: Boolean get() = addQuery("canDelete")
+  val canDeleteChildren: Boolean get() = addQuery("canDeleteChildren")
+  val canDownload: Boolean get() = addQuery("canDownload")
+  val canEdit: Boolean get() = addQuery("canEdit")
+  val canListChildren: Boolean get() = addQuery("canListChildren")
+  val canModifyContent: Boolean get() = addQuery("canModifyContent")
+  val canMoveChildrenOutOfDrive: Boolean get() = addQuery("canMoveChildrenOutOfDrive")
+  val canMoveChildrenOutOfTeamDrive: Boolean get() = addQuery("canMoveChildrenOutOfTeamDrive")
+  val canMoveChildrenWithinDrive: Boolean get() = addQuery("canMoveChildrenWithinDrive")
+  val canMoveChildrenWithinTeamDrive: Boolean get() = addQuery("canMoveChildrenWithinTeamDrive")
+  val canMoveItemIntoTeamDrive: Boolean get() = addQuery("canMoveItemIntoTeamDrive")
+  val canMoveItemOutOfDrive: Boolean get() = addQuery("canMoveItemOutOfDrive")
+  val canMoveItemOutOfTeamDrive: Boolean get() = addQuery("canMoveItemOutOfTeamDrive")
+  val canMoveItemWithinDrive: Boolean get() = addQuery("canMoveItemWithinDrive")
+  val canMoveItemWithinTeamDrive: Boolean get() = addQuery("canMoveItemWithinTeamDrive")
+  val canMoveTeamDriveItem: Boolean get() = addQuery("canMoveTeamDriveItem")
+  val canReadDrive: Boolean get() = addQuery("canReadDrive")
+  val canReadRevisions: Boolean get() = addQuery("canReadRevisions")
+  val canReadTeamDrive: Boolean get() = addQuery("canReadTeamDrive")
+  val canRemoveChildren: Boolean get() = addQuery("canRemoveChildren")
+  val canRemoveMyDriveParent: Boolean get() = addQuery("canRemoveMyDriveParent")
+  val canRename: Boolean get() = addQuery("canRename")
+  val canShare: Boolean get() = addQuery("canShare")
+  val canTrash: Boolean get() = addQuery("canTrash")
+  val canTrashChildren: Boolean get() = addQuery("canTrashChildren")
+  val canUntrash: Boolean get() = addQuery("canUntrash")
+}
+
+class DriveFileImageMediaMetadataFieldBuilder(
+  grouping: String = "imageMediaMetadata",
+  owner: DriveRequestFieldsBuilder? = null
+) : BaseFieldBuilder<File.ImageMediaMetadata, DriveFileImageMediaMetadataFieldBuilder>(
+  File.ImageMediaMetadata::class.java,
+  DriveFileImageMediaMetadataFieldBuilder::class.java,
+  grouping,
+  owner
+) {
+  val aperture: Boolean get() = addQuery("aperture")
+  val cameraMake: Boolean get() = addQuery("cameraMake")
+  val cameraModel: Boolean get() = addQuery("cameraModel")
+  val colorSpace: Boolean get() = addQuery("colorSpace")
+  val exposureBias: Boolean get() = addQuery("exposureBias")
+  val exposureMode: Boolean get() = addQuery("exposureMode")
+  val exposureTime: Boolean get() = addQuery("exposureTime")
+  val flashUsed: Boolean get() = addQuery("flashUsed")
+  val focalLength: Boolean get() = addQuery("focalLength")
+  val height: Boolean get() = addQuery("height")
+  val isoSpeed: Boolean get() = addQuery("isoSpeed")
+  val lens: Boolean get() = addQuery("lens")
+
+  fun location(block: DriveLocationFieldBuilder.() -> Unit) {
+    DriveLocationFieldBuilder(owner = this).use(block)
+  }
+
+  val maxApertureValue: Boolean get() = addQuery("maxApertureValue")
+  val meteringMode: Boolean get() = addQuery("meteringMode")
+  val rotation: Boolean get() = addQuery("rotation")
+  val sensor: Boolean get() = addQuery("sensor")
+  val subjectDistance: Boolean get() = addQuery("subjectDistance")
+  val time: Boolean get() = addQuery("time")
+  val whiteBalance: Boolean get() = addQuery("whiteBalance")
+  val width: Boolean get() = addQuery("width")
+}
+
+class DriveLocationFieldBuilder(
+  grouping: String = "location",
+  owner: DriveRequestFieldsBuilder? = null
+) : BaseFieldBuilder<File.ImageMediaMetadata.Location, DriveLocationFieldBuilder>(
+  File.ImageMediaMetadata.Location::class.java,
+  DriveLocationFieldBuilder::class.java,
+  grouping,
+  owner
+) {
+  val altitude: Boolean get() = addQuery("altitude")
+  val latitude: Boolean get() = addQuery("latitude")
+  val longitude: Boolean get() = addQuery("longitude")
+}
+
+class DriveShortcutDetailsFieldBuilder(
+  grouping: String = "shortcutDetails",
+  owner: DriveRequestFieldsBuilder? = null
+) : BaseFieldBuilder<File.ShortcutDetails, DriveShortcutDetailsFieldBuilder>(
+  File.ShortcutDetails::class.java,
+  DriveShortcutDetailsFieldBuilder::class.java,
+  grouping,
+  owner
+) {
+  val targetId: Boolean get() = addQuery("targetId")
+  val targetMimeType: Boolean get() = addQuery("targetMimeType")
+}
+
+class DriveVideoMediaMetadataFieldBuilder(
+  grouping: String = "shortcutDetails",
+  owner: DriveRequestFieldsBuilder? = null
+) : BaseFieldBuilder<File.VideoMediaMetadata, DriveVideoMediaMetadataFieldBuilder>(
+  File.VideoMediaMetadata::class.java,
+  DriveVideoMediaMetadataFieldBuilder::class.java,
+  grouping,
+  owner
+) {
+  val durationMillis: Boolean get() = addQuery("durationMillis")
+  val height: Boolean get() = addQuery("height")
+  val width: Boolean get() = addQuery("width")
+}
+
+class DriveAboutFieldBuilder(
+  grouping: String = "shortcutDetails",
+  owner: DriveRequestFieldsBuilder? = null
+) : BaseFieldBuilder<About, DriveAboutFieldBuilder>(
+  About::class.java,
+  DriveAboutFieldBuilder::class.java,
+  grouping,
+  owner
+) {
+  val appInstalled: Boolean get() = addQuery("appInstalled") // Boolean
+  val canCreateDrives: Boolean get() = addQuery("canCreateDrives") // Boolean
+  val canCreateTeamDrives: Boolean get() = addQuery("canCreateTeamDrives") // Boolean
+  fun driveThemes(block: DriveThemeFieldBuilder.() -> Unit) {
+    DriveThemeFieldBuilder("driveThemes", owner = this).use(block)
+  }
+
+  val exportFormats: Boolean get() = addQuery("exportFormats") // Map<String, List<String>>
+  val folderColorPalette: Boolean get() = addQuery("folderColorPalette") // List<String>
+  val importFormats: Boolean get() = addQuery("importFormats") // Map<String, List<String>>
+  val kind: Boolean get() = addQuery("kind") // String
+  val maxImportSizes: Boolean get() = addQuery("maxImportSizes") // Map<String, Long>
+  val maxUploadSize: Boolean get() = addQuery("maxUploadSize") // Long
+  fun storageQuota(block: DriveStorageQuotaFieldBuilder.() -> Unit) {
+    DriveStorageQuotaFieldBuilder(owner = this).use(block)
+  }
+
+  fun teamDriveThemes(block: DriveThemeFieldBuilder.() -> Unit) {
+    DriveThemeFieldBuilder("teamDriveThemes", owner = this).use(block)
+  }
+
+  fun user(block: DriveUserFieldBuilder.() -> Unit) {
+    DriveUserFieldBuilder(owner = this).use(block)
+  }
+}
+
+class DriveThemeFieldBuilder(
+  grouping: String = "driveThemes",
+  owner: DriveRequestFieldsBuilder? = null
+) : BaseFieldBuilder<About.DriveThemes, DriveThemeFieldBuilder>(
+  About.DriveThemes::class.java,
+  DriveThemeFieldBuilder::class.java,
+  grouping,
+  owner
+) {
+  val backgroundImageLink: Boolean get() = addQuery("backgroundImageLink")
+  val colorRgb: Boolean get() = addQuery("colorRgb")
+  val id: Boolean get() = addQuery("id")
+}
+
+
+class DriveStorageQuotaFieldBuilder(
+  grouping: String = "storageQuota",
+  owner: DriveRequestFieldsBuilder? = null
+) : BaseFieldBuilder<About.StorageQuota, DriveStorageQuotaFieldBuilder>(
+  About.StorageQuota::class.java,
+  DriveStorageQuotaFieldBuilder::class.java,
+  grouping,
+  owner
+) {
+  val limit: Boolean get() = addQuery("limit")
+  val usage: Boolean get() = addQuery("usage")
+  val usageInDrive: Boolean get() = addQuery("usageInDrive")
+  val usageInDriveTrash: Boolean get() = addQuery("usageInDriveTrash")
+}
+
 fun Drive.Files.List.buildFields(block: DriveFilesListRequestFieldsBuilder.() -> Unit = {}): Drive.Files.List {
-  val builder = DriveFilesListRequestFieldsBuilder().apply(block)
-  this.fields = builder.finalValue
+  this.fields = DriveFilesListRequestFieldsBuilder().apply(block).finalValue
   return this
 }
 
 fun Drive.Files.Get.buildFields(block: DriveFileFieldBuilder.() -> Unit = {}): Drive.Files.Get {
-  val builder = DriveFileFieldBuilder().apply(block)
-  this.fields = builder.finalValue
+  this.fields = DriveFileFieldBuilder().apply(block).finalValue
   return this
 }
 
@@ -293,372 +483,7 @@ fun Drive.Files.Get.buildFields(block: DriveFileFieldBuilder.() -> Unit = {}): D
      newStartPageToken,nextPageToken,changes(type,changeType,time,removed,fileId,file(id,name,mimeType,starred,trashed,parents,version,size,exportLinks))
  */
 
-/* TODO Expand this to be more general and usable for other requests now that I'm starting to
-        explore the Drive.Changes.* api, which will also involve setting response fields.
- */
-
 /*
-
-File:
-Map<String, String> appProperties;
-Capabilities capabilities;
-ContentHints contentHints;
-Boolean copyRequiresWriterPermission;
-DateTime createdTime;
-String description;
-String driveId;
-Boolean explicitlyTrashed;
-Map<String, String> exportLinks;
-String fileExtension;
-String folderColorRgb;
-String fullFileExtension;
-Boolean hasAugmentedPermissions;
-Boolean hasThumbnail;
-String headRevisionId;
-String iconLink;
-String id;
-ImageMediaMetadata imageMediaMetadata;
-Boolean isAppAuthorized;
-String kind;
-User lastModifyingUser;
-String md5Checksum;
-String mimeType;
-Boolean modifiedByMe;
-DateTime modifiedByMeTime;
-DateTime modifiedTime;
-String name;
-String originalFilename;
-Boolean ownedByMe;
-List<User> owners;
-List<String> parents;
-List<String> permissionIds;
-List<Permission> permissions;
-Map<String, String> properties;
-Long quotaBytesUsed;
-Boolean shared;
-DateTime sharedWithMeTime;
-User sharingUser;
-ShortcutDetails shortcutDetails;
-Long size;
-List<String> spaces;
-Boolean starred;
-String teamDriveId;
-String thumbnailLink;
-Long thumbnailVersion;
-Boolean trashed;
-DateTime trashedTime;
-User trashingUser;
-Long version;
-VideoMediaMetadata videoMediaMetadata;
-Boolean viewedByMe;
-DateTime viewedByMeTime;
-Boolean viewersCanCopyContent;
-String webContentLink;
-String webViewLink;
-Boolean writersCanShare;
-
-Drive.Capabilities:
-Boolean canAddChildren
-Boolean canAddMyDriveParent
-Boolean canChangeCopyRequiresWriterPermission
-Boolean canChangeViewersCanCopyContent
-Boolean canComment
-Boolean canCopy
-Boolean canDelete
-Boolean canDeleteChildren
-Boolean canDownload
-Boolean canEdit
-Boolean canListChildren
-Boolean canModifyContent
-Boolean canMoveChildrenOutOfDrive
-Boolean canMoveChildrenOutOfTeamDrive
-Boolean canMoveChildrenWithinDrive
-Boolean canMoveChildrenWithinTeamDrive
-Boolean canMoveItemIntoTeamDrive
-Boolean canMoveItemOutOfDrive
-Boolean canMoveItemOutOfTeamDrive
-Boolean canMoveItemWithinDrive
-Boolean canMoveItemWithinTeamDrive
-Boolean canMoveTeamDriveItem
-Boolean canReadDrive
-Boolean canReadRevisions
-Boolean canReadTeamDrive
-Boolean canRemoveChildren
-Boolean canRemoveMyDriveParent
-Boolean canRename
-Boolean canShare
-Boolean canTrash
-Boolean canTrashChildren
-Boolean canUntrash
-
-ContentHints:
-String indexableText
-Thumbnail thumbnail
-
-Thumbnail: (this class is only used if google drive cant make a normal thumbnail)
-String image
-String mimeType
-
-ImageMediaMetadata:
-Float aperture
-String cameraMake
-String cameraModel
-String colorSpace
-Float exposureBias
-String exposureMode
-Float exposureTime
-Boolean flashUsed
-Float focalLength
-Integer height
-Integer isoSpeed
-String lens
-Location location
-Float maxApertureValue
-String meteringMode
-Integer rotation
-String sensor
-Integer subjectDistance
-String time
-String whiteBalance
-Integer width
-
-ShortcutDetails:
-String targetId
-String targetMimeType
-
-VideoMediaMetadata:
-Long durationMillis
-Integer height
-Integer width
-
-User:
-String displayName
-String emailAddress
-String kind
-Boolean me
-String permissionId
-String photoLink
-
-About:
-Boolean appInstalled
-Boolean canCreateDrives
-Boolean canCreateTeamDrives
-List<DriveThemes> driveThemes
-Map<String, List<String>> exportFormats
-List<String> folderColorPalette
-Map<String, List<String>> importFormats
-String kind
-Map<String, Long> maxImportSizes
-Long maxUploadSize
-StorageQuota storageQuota
-List<TeamDriveThemes> teamDriveThemes
-User user
-
-StartPageToken:
-String kind
-String startPageToken
-
-Change:
-String changeType
-Drive drive
-String driveId
-File file
-String fileId
-String kind
-Boolean removed
-TeamDrive teamDrive
-String teamDriveId
-DateTime time
-String type
-
-Channel:
-String address
-Long expiration
-String id
-String kind
-Map<String, String> params
-Boolean payload
-String resourceId
-String resourceUri
-String token
-String type
-
-Comments:
-String anchor
-User author
-String content
-DateTime createdTime
-Boolean deleted
-String htmlContent
-String id
-String kind
-DateTime modifiedTime
-QuotedFileContent quotedFileContent
-List<Reply> replies
-Boolean resolved
-
-QuotedFileContent:
-String mimeType
-String value
-
-Reply:
-String action
-User author
-String content
-DateTime createdTime
-Boolean deleted
-String htmlContent
-String id
-String kind
-DateTime modifiedTime
-
-ChangeList:
-List<Change> changes
-String kind
-String newStartPageToken
-String nextPageToken
-
-CommentList:
-List<Comment> comments
-String kind
-String nextPageToken
-
-FileList:
-List<File> files;
-Boolean incompleteSearch;
-String kind;
-String nextPageToken;
-
-ReplyList:
-String kind
-String nextPageToken
-List<Reply> replies
-
-DriveList
-List<Drive> drives
-String kind
-String nextPageToken
-
-TeamDriveList:
-String kind
-String nextPageToken
-List<TeamDrive> teamDrives
-
-Drive (Model):
-BackgroundImageFile backgroundImageFile
-String backgroundImageLink
-Capabilities capabilities
-String colorRgb
-DateTime createdTime
-Boolean hidden
-String id
-String kind
-String name
-Restrictions restrictions
-String themeId
-
-TeamDrive:
-BackgroundImageFile backgroundImageFile
-String backgroundImageLink
-Capabilities capabilities
-String colorRgb
-DateTime createdTime
-String id
-String kind
-String name
-Restrictions restrictions
-String themeId
-String id
-Float width
-Float xCoordinate
-Float yCoordinate
-
-TeamDrive.Capabilities
-Boolean canAddChildren
-Boolean canChangeCopyRequiresWriterPermissionRestriction
-Boolean canChangeDomainUsersOnlyRestriction
-Boolean canChangeTeamDriveBackground
-Boolean canChangeTeamMembersOnlyRestriction
-Boolean canComment
-Boolean canCopy
-Boolean canDeleteChildren
-Boolean canDeleteTeamDrive
-Boolean canDownload
-Boolean canEdit
-Boolean canListChildren
-Boolean canManageMembers
-Boolean canReadRevisions
-Boolean canRemoveChildren
-Boolean canRename
-Boolean canRenameTeamDrive
-Boolean canShare
-Boolean canTrashChildren
-
-Restrictions:
-Boolean adminManagedRestrictions
-Boolean copyRequiresWriterPermission
-Boolean domainUsersOnly
-Boolean teamMembersOnly
-
-RevisionList:
-String kind
-String nextPageToken
-List<Revision> revisions
-
-Revision:
-Map<String, String> exportLinks
-String id
-Boolean keepForever
-String kind
-User lastModifyingUser
-String md5Checksum
-String mimeType
-DateTime modifiedTime
-String originalFilename
-Boolean publishAuto
-Boolean published
-Boolean publishedOutsideDomain
-Long size
-
-Permissions:
-Boolean allowFileDiscovery
-Boolean deleted
-String displayName
-String domain
-String emailAddress
-DateTime expirationTime
-String id
-String kind
-List<PermissionDetails> permissionDetails
-String photoLink
-String role
-List<TeamDrivePermissionDetails> teamDrivePermissionDetails
-String type
-
-PermissionDetails:
-Boolean inherited
-String inheritedFrom
-String permissionType
-String role
-
-TeamPermissions:
-Boolean inherited
-String inheritedFrom
-String role
-String teamDrivePermissionType
-
-DriveRequest<T>:
-String alt
-String fields
-String key
-String oauthToken
-Boolean prettyPrint
-String quotaUser
-String userIp
-
-========================================
-              Docs
-
 Document:
 Body body
 String documentId
@@ -1059,29 +884,6 @@ Model Fields:
     String image
     String mimeType
 
-  ImageMediaMetadata:
-    Float aperture
-    String cameraMake
-    String cameraModel
-    String colorSpace
-    Float exposureBias
-    String exposureMode
-    Float exposureTime
-    Boolean flashUsed
-    Float focalLength
-    Integer height
-    Integer isoSpeed
-    String lens
-    Location location
-    Float maxApertureValue
-    String meteringMode
-    Integer rotation
-    String sensor
-    Integer subjectDistance
-    String time
-    String whiteBalance
-    Integer width
-
   ShortcutDetails:
     String targetId
     String targetMimeType
@@ -1090,29 +892,6 @@ Model Fields:
     Long durationMillis
     Integer height
     Integer width
-
-  User:
-    String displayName
-    String emailAddress
-    String kind
-    Boolean me
-    String permissionId
-    String photoLink
-
-  About:
-    Boolean appInstalled
-    Boolean canCreateDrives
-    Boolean canCreateTeamDrives
-    List<DriveThemes> driveThemes
-    Map<String, List<String>> exportFormats
-    List<String> folderColorPalette
-    Map<String, List<String>> importFormats
-    String kind
-    Map<String, Long> maxImportSizes
-    Long maxUploadSize
-    StorageQuota storageQuota
-    List<TeamDriveThemes> teamDriveThemes
-    User user
 
   StartPageToken:
     String kind

@@ -72,7 +72,7 @@ class DriveFileSystem private constructor(
 
   private fun createDefaultListRequest(
     withQ: (GoogleDriveQueryBuilder.() -> Unit)? = null,
-    withFields: (DriveFieldsBuilder.() -> Unit)? = null,
+    withFields: (DriveFilesListRequestFieldsBuilder.() -> Unit)? = null,
     sortOrder: DriveOrderBy? = null,
   ) = driveService.service.files().list()
     .setCorpora(DriveCorporas.User)
@@ -392,7 +392,7 @@ class DriveFileSystem private constructor(
         .files()
         .get(dirId)
         .buildFields {
-          files { fileSystemDefaults() }
+          fileSystemDefaults()
         }
         .executeAsync(this.scope)
         .await()
@@ -463,7 +463,7 @@ class DriveFileSystem private constructor(
       scope: CoroutineScope,
       checkCancellation: Boolean,
       beforeEach: () -> Unit = {},
-      additionalFields: DriveFieldsBuilder.() -> Unit = {},
+      additionalFields: DriveFilesListRequestFieldsBuilder.() -> Unit = {},
       block: suspend FileList.() -> Unit
     ): Unit {
       req.buildFields {
