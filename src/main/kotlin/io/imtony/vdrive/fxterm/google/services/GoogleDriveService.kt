@@ -81,6 +81,16 @@ fun Drive.downloadFile(id: String, type: MimeType = MimeType.pdf): ByteArrayOutp
       .executeMediaAndDownloadTo(this)
   }
 
+private const val MIN_PAGE_SIZE = 1
+private const val MAX_PAGE_SIZE = 1000
+
+/**
+ * Sets this [Drive.Files.List] request to use the maximum result page size.
+ *
+ * #### Google's page maximum is <u>1000</u>.
+ */
+fun Drive.Files.List.useMaxPageCount(): Drive.Files.List = this.setPageSize(MAX_PAGE_SIZE)
+
 /**
  * Sets the fields to be returned from this request as id and name only.
  */

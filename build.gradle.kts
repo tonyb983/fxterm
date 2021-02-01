@@ -47,6 +47,7 @@ dependencies {
   implementation(kotlin("stdlib-jdk8", "1.4.21"))
 
   implementation("io.github.microutils:kotlin-logging-jvm:2.0.2")
+  implementation("ch.qos.logback:logback-classic:1.3.0-alpha5")
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:1.4.2")
@@ -116,7 +117,8 @@ tasks.withType<KotlinCompile> {
       "-Xinline-classes",
       "-Xopt-in=kotlin.io.path.ExperimentalPathApi",
       "-Xopt-in=kotlin.contracts.ExperimentalContracts",
-      "-Xopt-in=kotlin.ExperimentalStdlibApi"
+      "-Xopt-in=kotlin.ExperimentalStdlibApi",
+      "-Xopt-in=kotlin.time.ExperimentalTime"
     )
     jvmTarget = "15"
     apiVersion = "1.4"

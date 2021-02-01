@@ -55,7 +55,7 @@ sealed class MimeType(
 
   override fun toString(): String = mime
   override fun hashCode(): Int = mime.hashCode()
-  override fun equals(other: Any?): Boolean = when (other) {
+  override infix operator fun equals(other: Any?): Boolean = when (other) {
     is MimeType -> this.mime == other.mime
     is String -> this.mime == other
     else -> false
@@ -1145,3 +1145,5 @@ fun DriveFile.isDriveShortcut(): Boolean = this.mimeType != null && this.mimeTyp
 fun DriveFile.isDriveFile(): Boolean = this.mimeType != null && this.mimeType.let {
   it != MimeType.googleDocument.mime && it != MimeType.googleShortcut.mime && it != MimeType.invalid.mime
 }
+
+infix fun String.equals(mimeType: MimeType?): Boolean = this == mimeType?.mime

@@ -1,15 +1,20 @@
 package io.imtony.vdrive.fxterm
 
+import dispatch.core.DispatcherProvider
 import io.imtony.vdrive.fxterm.commands.CommandProcessor
 import io.imtony.vdrive.fxterm.fs.DriveFileSystem
 import io.imtony.vdrive.fxterm.google.services.GoogleServiceCollection
 import io.imtony.vdrive.fxterm.utils.getLineEnding
 import io.imtony.vdrive.fxterm.utils.lockProperty
+import javafx.geometry.Insets
 import javafx.scene.Parent
 import javafx.scene.control.TextField
+import javafx.scene.layout.Background
+import javafx.scene.layout.BackgroundFill
+import javafx.scene.layout.CornerRadii
 import javafx.scene.paint.Color
-import javafx.scene.text.Font
 import javafx.scene.text.Text
+import javafx.util.Duration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -40,13 +45,20 @@ class MainView : View("Main View"), CoroutineScope {
 
   init {
     inputLock.lock()
-    launch { runInit() }
+    runLater(Duration.millis(200.0)) {
+      launch { runInit() }
+    }
   }
 
   private suspend fun runInit() {
     google = GoogleServiceCollection.createDefault()
     DFS = DriveFileSystem.newAsync(this, google.drive).await()
     commandProcessor = CommandProcessor(google, DFS)
+    runLater {
+      addOutput("Listing root Drive contents.")
+      DFS.getDirContents("/").forEach { addOutput("\t - $it") }
+      inputLock.unlock()
+    }
   }
 
   private fun addOutput(text: String) {
@@ -72,11 +84,14 @@ class MainView : View("Main View"), CoroutineScope {
       fitToParentSize()
       scrollpane {
         fitToParentSize()
-        style {
-          this.backgroundColor = multi(Color.rgb(42, 33, 57))
-        }
+        this.background = Background(BackgroundFill(Color.rgb(42, 33, 57), CornerRadii.EMPTY, Insets(5.0)))
         // text(outputDisplay) { fitToParentSize() }
-        textflow {
+        this.content = textflow {
+          this.background = Background(BackgroundFill(Color.rgb(42, 33, 57), CornerRadii.EMPTY, Insets(5.0)))
+          fitToParentSize()
+          outputDisplay.onChange {
+            this@scrollpane.vvalue = 1.0
+          }
           fitToParentSize()
           bindChildren(outputTexts) { it }
           style {
@@ -101,5 +116,5 @@ class MainView : View("Main View"), CoroutineScope {
 
   private var job = Job()
   override val coroutineContext: CoroutineContext
-    get() = Dispatchers.JavaFx + job
+    get() = Dispatchers.JavaFx + job + DispatcherProvider()
 }

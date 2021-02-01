@@ -1,4 +1,4 @@
-@file:Suppress("unused", "TooManyFunctions", "CovariantEquals")
+@file:Suppress("unused", "TooManyFunctions", "CovariantEquals", "MemberVisibilityCanBePrivate")
 
 package io.imtony.vdrive.fxterm.google.ext.drive
 
@@ -566,7 +566,12 @@ open class GoogleDriveQueryBuilder(
   fun value(value: String, escape: Boolean): QueryValue = QueryValue(value, escape)
 
   /**
-   * Starts a query operation that targets the **mimeType** property of Drive Files.
+   * Starts a query operation that targets the **id** property of a Drive File.
+   */
+  val fileId: GenericQueryTermOperation get() = GenericQueryTermOperation(QueryTerm("id"), this)
+
+  /**
+   * Starts a query operation that targets the **mimeType** property of a Drive File.
    */
   val mimeType: MimeTypeQueryOperation get() = MimeTypeQueryOperation(this)
 
@@ -604,6 +609,26 @@ open class GoogleDriveQueryBuilder(
    * Convenience function to create the query **starred = true**.
    */
   fun isStarred(): GoogleDriveQuery = target("starred") equals true
+
+  /** Convenience function equal to `mimeType equals value(type.mime)`. */
+  fun onlyType(type: MimeType): GoogleDriveQuery = mimeType equals value(type.mime)
+
+  /** Convenience function equal to `mimeType doesntEqual value(type.mime)`. */
+  fun notType(type: MimeType): GoogleDriveQuery = mimeType doesntEqual value(type.mime)
+
+  /**
+   * Convenience function that adds an or group including each given [MimeType]. Equal to:
+   * ```kotlin
+   * or(grouped = true) {
+   *   for (type in types) mimeType equals value(type.mime)
+   * }
+   * ```
+   */
+  fun onlyTypes(vararg types: MimeType): Unit = or(true) {
+    for (type in types) {
+      mimeType equals value(type.mime)
+    }
+  }
 
   /**
    * ### Creates a parenthesis grouped query.

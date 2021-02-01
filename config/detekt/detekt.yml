@@ -337,8 +337,8 @@ formatting:
     active: true
     autoCorrect: true
   NoUnitReturn:
-    active: true
-    autoCorrect: true
+    active: false
+    autoCorrect: false
   NoUnusedImports:
     active: true
     autoCorrect: true
@@ -748,7 +748,7 @@ style:
   OptionalAbstractKeyword:
     active: true
   OptionalUnit:
-    active: true
+    active: false
   OptionalWhenBraces:
     active: true
   PreferToOverPairSyntax:
