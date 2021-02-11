@@ -1,0 +1,10 @@
+query GetNotesCreatedBetween($older: LocalDateTime!, $newer: LocalDateTime!) {
+  getNotesCreatedBetween(older: $older, newer: $newer) {
+    id
+    title
+    content
+    tags
+    created
+    updated
+  }
+}

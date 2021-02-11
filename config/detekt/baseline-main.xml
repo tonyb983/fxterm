@@ -221,7 +221,7 @@
     <ID>OptionalUnit:Main.kt$Unit</ID>
     <ID>PrintStackTrace:DriveFileSystem.kt$DriveFileSystem$logged</ID>
     <ID>RedundantSuspendModifier:CommandProcessor.kt$CommandProcessor$suspend</ID>
-    <ID>StringTemplate:io.imtony.vdrive.fxterm.MainView.kt:51</ID>
+    <ID>StringTemplate:io.imtony.vdrive.fxterm.ui.views.MainView.kt:51</ID>
     <ID>TopLevelPropertyNaming:StringUtils.kt$internal const val empty_: String = ""</ID>
     <ID>TopLevelPropertyNaming:StringUtils.kt$internal const val nixEnding = "\n"</ID>
     <ID>TopLevelPropertyNaming:StringUtils.kt$internal const val windowsEnding = "\r\n"</ID>

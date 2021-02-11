@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Generated Files" pattern="*generated*||file[fxterm.main]:kotlin/io/imtony/vdrive/fxterm/generated//*" />
+</component>

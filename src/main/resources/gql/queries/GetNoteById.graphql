@@ -1,0 +1,11 @@
+query GetNoteById($id: UUID!) {
+  getById(id:$id) {
+    id
+    title
+    content
+    tags
+    created
+    updated
+  }
+}
+

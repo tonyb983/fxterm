@@ -1,0 +1,3 @@
+mutation DeleteNote($input: DeleteNoteInput!) {
+  deleteNote(input: $input)
+}

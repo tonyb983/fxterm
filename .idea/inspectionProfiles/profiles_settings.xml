@@ -1,5 +1,7 @@
 <component name="InspectionProjectProfileManager">
   <settings>
+    <option name="USE_PROJECT_PROFILE" value="false" />
+    <version value="1.0" />
     <info color="7a5900">
       <option name="FONT_TYPE" value="2" />
       <option name="EFFECT_COLOR" value="c48db4" />

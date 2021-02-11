@@ -1,0 +1,10 @@
+query SearchNotesByContent($text: String!, $ignoreCase: Boolean, $exact: Boolean) {
+  findByContent(title: $text, ignoreCase: $ignoreCase, exact: $exact) {
+    id
+    title
+    content
+    tags
+    created
+    updated
+  }
+}

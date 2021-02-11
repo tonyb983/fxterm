@@ -1,10 +1,10 @@
 package io.imtony.vdrive.fxterm
 
-import tornadofx.launch
+import javafx.application.Application
 
 /**
  * JVM entry point.
  */
-fun main(): Unit {
-  launch<FxTermApp>()
+fun main(args: Array<String>): Unit {
+  Application.launch(FxTermApp::class.java, *args)
 }

@@ -1,0 +1,31 @@
+{
+  "name": "NoteDB GraphQL Schema",
+  "schemaPath": "./schema.graphql",
+  "schema": "http://localhost:8080/graphql",
+  "documents": ["./queries/**.graphql", "./mutations/**.graphql", "./fragments/**.graphql"],
+  "extensions": {
+    "endpoints": {
+      "Default GraphQL Endpoint": {
+        "url": "http://localhost:8080/graphql",
+        "headers": {
+          "user-agent": "graphql-kotlin"
+        },
+        "introspect": true
+      },
+      "Playground GraphQL Endpoint": {
+        "url": "http://localhost:8080/playground",
+        "headers": {
+          "user-agent": "graphql-kotlin"
+        },
+        "introspect": false
+      },
+      "SDL GraphQL Endpoint": {
+        "url": "http://localhost:8080/sdl",
+        "headers": {
+          "user-agent": "graphql-kotlin"
+        },
+        "introspect": true
+      }
+    }
+  }
+}

@@ -294,7 +294,7 @@ formatting:
   ImportOrdering:
     active: true
     autoCorrect: true
-    layout: 'idea'
+    layout: 'java.**, javax.**, |, kotlin.**, kotlinx.**, mu.**, |, *, |, io.imtony.**, ^'
   Indentation:
     active: false
     autoCorrect: true

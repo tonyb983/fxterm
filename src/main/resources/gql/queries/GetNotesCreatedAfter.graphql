@@ -1,0 +1,10 @@
+query GetNotesCreatedAfter($time: LocalDateTime!) {
+  getNotesCreatedAfter(time: $time) {
+    id
+    title
+    content
+    tags
+    created
+    updated
+  }
+}

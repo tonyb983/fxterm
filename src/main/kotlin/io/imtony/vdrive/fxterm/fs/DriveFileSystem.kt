@@ -105,12 +105,17 @@ class DriveFileSystem private constructor(
     val root = fs.getPath("/")
     cwd = root
 
+    // measureTimeMillis {
+    //   deepMapping()
+    // }.also { logger.info { "Mapped entire drive in '$it' ms." } }
+
     // Get all root files and directories from Google Drive
     val dirReq = createDefaultListRequest()
       .buildQ {
         and {
           onlyType(MimeType.googleFolder)
           notTrashed()
+          isRoot()
         }
       }
 
@@ -119,6 +124,7 @@ class DriveFileSystem private constructor(
         and {
           notType(MimeType.googleFolder)
           notTrashed()
+          isRoot()
         }
       }
 
@@ -149,14 +155,54 @@ class DriveFileSystem private constructor(
     }
 
     val p = fs.getPath(path)
-    if (p.exists()) {
-      return p.useDirectoryEntries { it.toList().toImmutableList() }.also {
+
+    if (!p.isDirectory()) {
+      logger.warn { "Cannot get the contents of a non-directory path. Path requested: '$path' '$p'" }
+      return emptyImmutableList()
+    }
+
+    if (isValidPath(p)) {
+      return p.listDirectoryEntries().toImmutableList().also {
         logger.info { "Found ${it.size} files in path '$path'" }
+      }
+    }
+
+    val up = mutableListOf<String>()
+    for (names in (p.nameCount - 1) downTo 0) {
+      val sub = p.subpath(0, names)
+
+      val mappedPath = mappedFiles.values.firstOrNull { it.second == sub }
+      if (mappedPath != null) {
+
       }
     }
 
     logger.warn { "Requested path '$path' does not exist!" }
     return emptyImmutableList()
+  }
+
+  fun getFile(pathString: String): Path? {
+    val path = runCatching {
+      if (pathString.startsWith("/")) {
+        fs.getPath(pathString)
+      } else {
+        cwd.resolve(pathString)
+      }
+    }.getOrElse {
+      if (it is InvalidPathException) {
+        logger.warn { "PathString represents invalid path: CWD: $cwd | PathString: $pathString" }
+      } else {
+        logger.error { "Unexpected exception trying to get path '$pathString'." }
+      }
+
+      return null
+    }
+
+    if (isValidPath(path)) {
+      return path
+    }
+
+    return null
   }
 
   private suspend fun mapListRequestTimed(
@@ -323,11 +369,22 @@ class DriveFileSystem private constructor(
   }
 
   private suspend fun deepMapping() {
-    val dirStack: MutableList<Pair<String, Path>> = mutableListOf()
-    val fileStack: MutableList<Pair<String, Path>> = mutableListOf()
+
+    val dirStack: MutableList<Pair<DriveFile, Path>> = mutableListOf()
+    val fileStack: MutableList<Pair<DriveFile, Path>> = mutableListOf()
     val fsRoot = fs.getPath("/")
     var dirsMapped = 0
     var filesMapped = 0
+
+    fun checkCancel(stage: String? = null) {
+      if (!this.scope.isActive) {
+        val msg = "Cancellation requested during deep map. " +
+          "${if (stage != null) "(Stage: $stage)" else ""} " +
+          "dirsMapped: $dirsMapped filesMapped: $filesMapped"
+        logger.warn { msg }
+        throw CancellationException(msg)
+      }
+    }
 
     val rootDirReq = createDefaultListRequest(
       withQ = {
@@ -341,12 +398,7 @@ class DriveFileSystem private constructor(
 
     var token = null as String?
     do {
-      if (!this.scope.isActive) {
-        val msg = "Cancellation requested during deepMapping (stage: Mapping root folders). " +
-          "dirsMapped: $dirsMapped filesMapped: $filesMapped"
-        logger.warn { msg }
-        throw CancellationException(msg)
-      }
+      checkCancel("Mapping root folders")
 
       val res = rootDirReq.executeAsync(this.scope).await()
       for (dir in res.files) {
@@ -371,8 +423,8 @@ class DriveFileSystem private constructor(
           .files
           .partition { it.mimeType == MimeType.googleFolder.mime }
 
-        dirStack.addAll(contentDirs.map { it.id to fsRoot / dir.name })
-        fileStack.addAll(contentFiles.map { it.id to fsRoot / dir.name })
+        dirStack.addAll(contentDirs.map { it to fsRoot / dir.name })
+        fileStack.addAll(contentFiles.map { it to fsRoot / dir.name })
       }
 
       token = res.nextPageToken
@@ -380,60 +432,37 @@ class DriveFileSystem private constructor(
     } while (token != null)
 
     while (dirStack.isNotEmpty()) {
-      if (!this.scope.isActive) {
-        val msg = "Cancellation requested during deep map. dirsMapped: $dirsMapped filesMapped: $filesMapped"
-        logger.warn { msg }
-        throw CancellationException(msg)
-      }
+      checkCancel("Mapping dirStack")
 
-      val (dirId, path) = dirStack.removeFirst()
+      val (df, path) = dirStack.removeFirst()
 
-      val file = driveService.service
-        .files()
-        .get(dirId)
-        .buildFields {
-          fileSystemDefaults()
-        }
-        .executeAsync(this.scope)
-        .await()
-
-      if (file == null) {
-        logger.warn { "ID '$dirId' pushed onto dirStack was not able to be retreived from the driveService." }
-        continue
-      }
-
-      mapDriveFileJob(file, path)
+      mapDriveFileJob(df, path)
       dirsMapped += 1
 
       val children = createDefaultListRequest(
         withQ = {
-          parents has value(dirId)
+          parents has value(df.id)
         }
       ).setPageSize(1000)
         .executeAsync(this.scope)
         .await()
         .files
 
-      val childPath = path / file.name
+      val childPath = path / df.name
       children
         .partition { it.mimeType equals MimeType.googleFolder }
         .let { (childFolders, childFiles) ->
-          dirStack.addAll(childFolders.map { it.id to childPath })
-          fileStack.addAll(childFiles.map { it.id to childPath })
+          dirStack.addAll(childFolders.map { it to childPath })
+          fileStack.addAll(childFiles.map { it to childPath })
         }
     }
 
-    fileStack.chunked(50).forEach { chunk ->
-      val ids = chunk.map { it.first }
-      createDefaultListRequest(
-        withQ = {
+    while (fileStack.isNotEmpty()) {
+      checkCancel("Mapping fileStack")
+      val (df, path) = fileStack.removeFirst()
 
-        }
-      )
-
-      driveService.service.files().list().buildQ {
-
-      }
+      mapDriveFileJob(df, path)
+      filesMapped += 1
     }
   }
 

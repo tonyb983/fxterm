@@ -1,0 +1,10 @@
+query GetAllNotes {
+  getAllNotes {
+    id
+    title
+    content
+    tags
+    created
+    updated
+  }
+}

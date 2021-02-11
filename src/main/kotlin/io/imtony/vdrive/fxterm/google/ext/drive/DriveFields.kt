@@ -1,7 +1,8 @@
+@file:Suppress("KDocMissingDocumentation")
+
 package io.imtony.vdrive.fxterm.google.ext.drive
 
 import com.google.api.services.drive.Drive
-import com.google.api.services.drive.DriveRequest
 import com.google.api.services.drive.model.About
 import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.FileList
@@ -61,7 +62,7 @@ open class BaseFieldBuilder<TTarget, TBuilder : BaseFieldBuilder<TTarget, TBuild
   protected var isClosed = false
 
   override fun close() {
-    val alreadyClosed = !isClosed
+    val alreadyClosed = isClosed
     val queriesEmpty = queries.isEmpty()
     val ownerNull = owner == null
 
